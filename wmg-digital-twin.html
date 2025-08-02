@@ -8,12 +8,9 @@
     <!-- External Libraries -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     
-    <!-- WMG Platform Stylesheets -->
-    <link rel="stylesheet" href="frontend/css/main.css">
+    <!-- Essential Stylesheets -->
     <link rel="stylesheet" href="frontend/css/themes/wmg-theme.css">
     <link rel="stylesheet" href="frontend/css/components/dashboard.css">
-    <link rel="stylesheet" href="frontend/css/components/controls.css">
-    <link rel="stylesheet" href="frontend/css/components/robotics.css">
 </head>
 <body>
     <!-- Loading Screen -->
@@ -23,12 +20,12 @@
             <div class="loading-spinner"></div>
             <h2>WMG Digital Twin Platform</h2>
             <p>Initializing Industrial Automation Systems...</p>
-            <div class="loading-progress"></div>
         </div>
     </div>
 
-    <!-- Main Application Container -->
+    <!-- Main Application -->
     <div id="application-container" class="application-container hidden">
+        
         <!-- Header -->
         <header class="main-header">
             <div class="header-content">
@@ -53,108 +50,74 @@
                         </div>
                     </div>
                 </div>
-            </header>
-        </div>
+            </div>
+        </header>
 
-        <!-- Main Dashboard Layout -->
+        <!-- Dashboard Layout -->
         <main class="dashboard-layout">
+            
             <!-- Left Control Panel -->
             <aside class="left-panel">
-                <!-- Training Control Section -->
-                <section class="control-section" id="training-control">
+                
+                <!-- System Status -->
+                <section class="control-section">
                     <div class="section-header">
-                        <h3 class="section-title">
-                            <i class="icon-brain"></i>
-                            RL Training Control
-                        </h3>
-                        <div class="section-status">
-                            <div id="training-status" class="status-indicator"></div>
-                            <span id="training-text">Stopped</span>
+                        <h3 class="section-title">🤖 WMG DIGITAL TWIN SYSTEM</h3>
+                    </div>
+                    <div class="section-content">
+                        <div class="status-grid">
+                            <div class="status-item">
+                                <label>Connection:</label>
+                                <span id="system-connection-status" class="status-value connected">●&nbsp;Connected</span>
+                            </div>
+                            <div class="status-item">
+                                <label>Training:</label>
+                                <span id="system-training-status" class="status-value active">●&nbsp;Active</span>
+                            </div>
                         </div>
+                    </div>
+                </section>
+
+                <!-- RL Training Control -->
+                <section class="control-section">
+                    <div class="section-header">
+                        <h3 class="section-title">🧠 RL TRAINING CONTROL</h3>
                     </div>
                     
                     <div class="section-content">
-                        <div class="control-grid">
-                            <button id="start-training" class="primary-button">
-                                <i class="icon-play"></i>
-                                Start Training
-                            </button>
-                            <button id="stop-training" class="danger-button" disabled>
-                                <i class="icon-stop"></i>
-                                Stop Training
-                            </button>
-                            <button id="reset-system" class="secondary-button">
-                                <i class="icon-reset"></i>
-                                Reset System
-                            </button>
+                        <div class="control-buttons">
+                            <button id="start-training" class="control-btn start-btn">Start Training</button>
+                            <button id="stop-training" class="control-btn stop-btn" disabled>Stop Training</button>
+                            <button id="reset-system" class="control-btn reset-btn">Reset System</button>
                         </div>
                         
-                        <div class="metrics-grid">
-                            <div class="metric-card">
-                                <label>Episode</label>
-                                <span id="current-episode" class="metric-value">0</span>
+                        <div class="training-metrics">
+                            <div class="metric-row">
+                                <label>Episode:</label>
+                                <span id="current-episode" class="metric-value">525</span>
                             </div>
-                            <div class="metric-card">
-                                <label>Epsilon</label>
-                                <span id="epsilon-value" class="metric-value">1.00</span>
-                            </div>
-                            <div class="metric-card">
-                                <label>Reward</label>
-                                <span id="current-reward" class="metric-value">0.0</span>
+                            <div class="metric-row">
+                                <label>Epsilon:</label>
+                                <span id="epsilon-value" class="metric-value">0.072</span>
                             </div>
                         </div>
                     </div>
                 </section>
 
-                <!-- Code Generation Section -->
-                <section class="control-section" id="code-generation">
+                <!-- Code Generation -->
+                <section class="control-section">
                     <div class="section-header">
-                        <h3 class="section-title">
-                            <i class="icon-code"></i>
-                            Code Generation
-                        </h3>
+                        <h3 class="section-title">📊 CODE GENERATION</h3>
                     </div>
                     
                     <div class="section-content">
-                        <div class="control-grid">
-                            <button id="generate-code" class="primary-button">
-                                <i class="icon-generate"></i>
-                                Generate PLC Code
-                            </button>
-                            <button id="download-code" class="secondary-button" disabled>
-                                <i class="icon-download"></i>
-                                Download Code
-                            </button>
+                        <div class="control-buttons">
+                            <button id="generate-code" class="control-btn generate-btn">Generate PLC Code</button>
+                            <button id="download-code" class="control-btn download-btn" disabled>Download Code</button>
                         </div>
                     </div>
                 </section>
-
-                <!-- System Information -->
-                <section class="control-section" id="system-info">
-                    <div class="section-header">
-                        <h3 class="section-title">
-                            <i class="icon-info"></i>
-                            System Information
-                        </h3>
-                    </div>
-                    
-                    <div class="section-content">
-                        <div class="info-grid">
-                            <div class="info-item">
-                                <label>Version</label>
-                                <span>v1.0.0</span>
-                            </div>
-                            <div class="info-item">
-                                <label>Environment</label>
-                                <span>Production</span>
-                            </div>
-                            <div class="info-item">
-                                <label>Uptime</label>
-                                <span id="system-uptime">0h 0m</span>
-                            </div>
-                        </div>
-                    </div>
-                </section>
+                
             </aside>
 
             <!-- Central Visualization Area -->
@@ -162,29 +125,27 @@
                 <div class="viewport-header">
                     <h2 class="viewport-title">Robot Digital Twin</h2>
                     <div class="viewport-controls">
-                        <button class="view-button active" data-view="3d">3D View</button>
-                        <button class="view-button" data-view="kinematics">Kinematics</button>
-                        <button class="view-button" data-view="workspace">Workspace</button>
+                        <button class="view-button active">3D View</button>
                     </div>
                 </div>
                 
                 <div class="robot-container">
                     <canvas id="robot-canvas" class="robot-canvas"></canvas>
                     
-                    <!-- Overlay Information -->
+                    <!-- Robot Position Display -->
                     <div class="robot-overlay">
                         <div class="coordinate-display">
                             <div class="coord-item">
                                 <label>X:</label>
-                                <span id="robot-x">0.000</span>
+                                <span id="robot-x">-1.040</span>
                             </div>
                             <div class="coord-item">
                                 <label>Y:</label>
-                                <span id="robot-y">0.000</span>
+                                <span id="robot-y">-1.405</span>
                             </div>
                             <div class="coord-item">
                                 <label>Z:</label>
-                                <span id="robot-z">0.600</span>
+                                <span id="robot-z">0.451</span>
                             </div>
                         </div>
                     </div>
@@ -193,181 +154,152 @@
 
             <!-- Right Information Panel -->
             <aside class="right-panel">
+                
                 <!-- Performance Metrics -->
-                <section class="metrics-section" id="performance-metrics">
+                <section class="metrics-section">
                     <div class="section-header">
-                        <h3 class="section-title">
-                            <i class="icon-chart"></i>
-                            Performance Metrics
-                        </h3>
+                        <h3 class="section-title">📈 PERFORMANCE METRICS</h3>
                     </div>
                     
                     <div class="section-content">
-                        <div class="metric-cards">
-                            <div class="metric-card primary">
-                                <div class="metric-icon">
-                                    <i class="icon-clock"></i>
-                                </div>
-                                <div class="metric-content">
-                                    <label>Cycle Time</label>
-                                    <span id="cycle-time" class="metric-value">0.0s</span>
-                                </div>
+                        <div class="performance-grid">
+                            <div class="perf-item">
+                                <label>Cycle Time:</label>
+                                <span id="cycle-time" class="perf-value">18.7s</span>
                             </div>
-                            
-                            <div class="metric-card success">
-                                <div class="metric-icon">
-                                    <i class="icon-production"></i>
-                                </div>
-                                <div class="metric-content">
-                                    <label>Throughput</label>
-                                    <span id="throughput" class="metric-value">0.0/min</span>
-                                </div>
+                            <div class="perf-item">
+                                <label>Throughput:</label>
+                                <span id="throughput" class="perf-value">2.5/min</span>
                             </div>
-                            
-                            <div class="metric-card warning">
-                                <div class="metric-icon">
-                                    <i class="icon-shield"></i>
-                                </div>
-                                <div class="metric-content">
-                                    <label>Safety Score</label>
-                                    <span id="safety-score" class="metric-value">100%</span>
-                                </div>
+                            <div class="perf-item">
+                                <label>Safety Score:</label>
+                                <span id="safety-score" class="perf-value">100.0%</span>
                             </div>
-                            
-                            <div class="metric-card info">
-                                <div class="metric-icon">
-                                    <i class="icon-energy"></i>
-                                </div>
-                                <div class="metric-content">
-                                    <label>Energy Efficiency</label>
-                                    <span id="energy-efficiency" class="metric-value">85%</span>
-                                </div>
+                            <div class="perf-item">
+                                <label>Energy Efficiency:</label>
+                                <span id="energy-efficiency" class="perf-value">41.5%</span>
                             </div>
-                            
-                            <div class="metric-card accent">
-                                <div class="metric-icon">
-                                    <i class="icon-oee"></i>
-                                </div>
-                                <div class="metric-content">
-                                    <label>OEE</label>
-                                    <span id="oee-value" class="metric-value">0.0%</span>
-                                </div>
+                            <div class="perf-item">
+                                <label>OEE:</label>
+                                <span id="oee-value" class="perf-value">2.0%</span>
+                            </div>
+                            <div class="perf-item">
+                                <label>Reward:</label>
+                                <span id="current-reward" class="perf-value">1628.22</span>
                             </div>
                         </div>
                     </div>
                 </section>
 
                 <!-- Robot Control -->
-                <section class="control-section" id="robot-control">
+                <section class="control-section">
                     <div class="section-header">
-                        <h3 class="section-title">
-                            <i class="icon-robot"></i>
-                            Robot Control
-                        </h3>
-                        <div class="control-mode">
-                            <button class="mode-button active" data-mode="manual">Manual</button>
-                            <button class="mode-button" data-mode="auto">Auto</button>
-                        </div>
+                        <h3 class="section-title">🦾 ROBOT CONTROL</h3>
                     </div>
                     
                     <div class="section-content">
                         <div class="joint-controls">
-                            <div class="joint-control" data-joint="0">
-                                <label>Base</label>
-                                <div class="joint-slider-container">
-                                    <input type="range" id="joint0-slider" class="joint-slider" 
-                                           min="-180" max="180" value="0" step="1">
-                                    <span id="joint0-value" class="joint-value">0°</span>
-                                </div>
+                            <div class="joint-control">
+                                <label>Base: <span id="joint0-value">-38°</span></label>
+                                <input type="range" id="joint0-slider" class="joint-slider base-slider" 
+                                       min="-180" max="180" value="-38" step="1">
                             </div>
                             
-                            <div class="joint-control" data-joint="1">
-                                <label>Shoulder</label>
-                                <div class="joint-slider-container">
-                                    <input type="range" id="joint1-slider" class="joint-slider" 
-                                           min="-90" max="90" value="0" step="1">
-                                    <span id="joint1-value" class="joint-value">0°</span>
-                                </div>
+                            <div class="joint-control">
+                                <label>Shoulder: <span id="joint1-value">26°</span></label>
+                                <input type="range" id="joint1-slider" class="joint-slider shoulder-slider" 
+                                       min="-90" max="90" value="26" step="1">
                             </div>
                             
-                            <div class="joint-control" data-joint="2">
-                                <label>Elbow</label>
-                                <div class="joint-slider-container">
-                                    <input type="range" id="joint2-slider" class="joint-slider" 
-                                           min="-135" max="40" value="0" step="1">
-                                    <span id="joint2-value" class="joint-value">0°</span>
-                                </div>
+                            <div class="joint-control">
+                                <label>Elbow: <span id="joint2-value">-33°</span></label>
+                                <input type="range" id="joint2-slider" class="joint-slider elbow-slider" 
+                                       min="-135" max="40" value="-33" step="1">
                             </div>
-                            
-                            <div class="joint-control" data-joint="3">
-                                <label>Wrist 1</label>
-                                <div class="joint-slider-container">
-                                    <input type="range" id="joint3-slider" class="joint-slider" 
-                                           min="-180" max="180" value="0" step="1">
-                                    <span id="joint3-value" class="joint-value">0°</span>
-                                </div>
+
+                            <div class="joint-control">
+                                <label>Wrist 1: <span id="joint3-value">-11°</span></label>
+                                <input type="range" id="joint3-slider" class="joint-slider wrist1-slider" 
+                                       min="-180" max="180" value="-11" step="1">
                             </div>
-                            
-                            <div class="joint-control" data-joint="4">
-                                <label>Wrist 2</label>
-                                <div class="joint-slider-container">
-                                    <input type="range" id="joint4-slider" class="joint-slider" 
-                                           min="-120" max="120" value="0" step="1">
-                                    <span id="joint4-value" class="joint-value">0°</span>
-                                </div>
+
+                            <div class="joint-control">
+                                <label>Wrist 2: <span id="joint4-value">60°</span></label>
+                                <input type="range" id="joint4-slider" class="joint-slider wrist2-slider" 
+                                       min="-120" max="120" value="60" step="1">
                             </div>
-                            
-                            <div class="joint-control" data-joint="5">
-                                <label>Tool</label>
-                                <div class="joint-slider-container">
-                                    <input type="range" id="joint5-slider" class="joint-slider" 
-                                           min="-360" max="360" value="0" step="1">
-                                    <span id="joint5-value" class="joint-value">0°</span>
-                                </div>
+
+                            <div class="joint-control">
+                                <label>Tool: <span id="joint5-value">-14°</span></label>
+                                <input type="range" id="joint5-slider" class="joint-slider tool-slider" 
+                                       min="-360" max="360" value="-14" step="1">
                             </div>
-                        </div>
-                        
-                        <div class="preset-controls">
-                            <button class="preset-button" data-preset="home">Home</button>
-                            <button class="preset-button" data-preset="ready">Ready</button>
-                            <button class="preset-button" data-preset="park">Park</button>
                         </div>
                     </div>
                 </section>
+                
             </aside>
-        </main>
 
-        <!-- Bottom System Log -->
-        <footer class="system-log">
-            <div class="log-header">
-                <h3 class="log-title">
-                    <i class="icon-log"></i>
-                    System Log
-                </h3>
-                <div class="log-controls">
-                    <button class="log-button" id="clear-log">Clear</button>
-                    <button class="log-button" id="export-log">Export</button>
-                </div>
-            </div>
-            
-            <div class="log-container">
-                <div id="log-content" class="log-content">
-                    <div class="log-entry info">
-                        <span class="log-timestamp">[2025-08-02 13:11:00]</span>
-                        <span class="log-level">INFO</span>
-                        <span class="log-message">WMG Digital Twin Platform initialized successfully</span>
+            <!-- System Log -->
+            <footer class="system-log">
+                <div class="log-header">
+                    <h3 class="log-title">📋 SYSTEM LOG</h3>
+                    <div class="log-controls">
+                        <button class="log-button" id="clear-log">Clear</button>
+                        <button class="log-button" id="export-log">Export</button>
                     </div>
                 </div>
-            </div>
-        </footer>
+                
+                <div class="log-container">
+                    <div id="log-content" class="log-content">
+                        <div class="log-entry info">
+                            <span class="log-timestamp">[1:31:45 PM]</span>
+                            <span class="log-level">INFO</span>
+                            <span class="log-message">Episode 519: Reward=1682.07</span>
+                        </div>
+                        <div class="log-entry info">
+                            <span class="log-timestamp">[1:31:45 PM]</span>
+                            <span class="log-level">INFO</span>
+                            <span class="log-message">Episode 520: Reward=1684.45</span>
+                        </div>
+                        <div class="log-entry info">
+                            <span class="log-timestamp">[1:31:45 PM]</span>
+                            <span class="log-level">INFO</span>
+                            <span class="log-message">Episode 521: Reward=1686.84</span>
+                        </div>
+                        <div class="log-entry info">
+                            <span class="log-timestamp">[1:31:46 PM]</span>
+                            <span class="log-level">INFO</span>
+                            <span class="log-message">Episode 522: Reward=1677.02</span>
+                        </div>
+                        <div class="log-entry info">
+                            <span class="log-timestamp">[1:31:46 PM]</span>
+                            <span class="log-level">INFO</span>
+                            <span class="log-message">Episode 523: Reward=1628.39</span>
+                        </div>
+                        <div class="log-entry warning">
+                            <span class="log-timestamp">[1:31:46 PM]</span>
+                            <span class="log-level">WARN</span>
+                            <span class="log-message">Episode 524: Reward=1626.10</span>
+                        </div>
+                        <div class="log-entry info">
+                            <span class="log-timestamp">[1:31:46 PM]</span>
+                            <span class="log-level">INFO</span>
+                            <span class="log-message">Episode 525: Reward=1628.22</span>
+                        </div>
+                    </div>
+                </div>
+            </footer>
+            
+        </main>
     </div>
 
-    <!-- Application Scripts -->
+    <!-- Essential JavaScript Modules -->
     <script src="frontend/js/core/event-dispatcher.js"></script>
-    <script src="frontend/js/robotics/robot-controller.js"></script>
     <script src="frontend/js/core/websocket-manager.js"></script>
-    <script src="frontend/js/robotics/robot-visualizer.js"></script>
     <script src="frontend/js/robotics/inverse-kinematics.js"></script>
+    <script src="frontend/js/robotics/robot-visualizer.js"></script>
+    <script src="frontend/js/robotics/robot-controller.js"></script>
     <script src="frontend/main.js"></script>
 </body>
 </html>
