@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WMG RL Digital Twin Platform - University of Warwick</title>
+    
+    <!-- External Libraries -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    
+    <!-- WMG Platform Stylesheets -->
+    <link rel="stylesheet" href="frontend/css/main.css">
+    <link rel="stylesheet" href="css/wmg-theme.css">
+    <link rel="stylesheet" href="css/dashboard.css">
+    <link rel="stylesheet" href="css/controls.css">
+    <link rel="stylesheet" href="css/robotics.css">
+</head>
+<body>
+    <!-- Loading Screen -->
+    <div id="loading-overlay" class="loading-overlay">
+        <div class="loading-content">
+            <div class="wmg-logo"></div>
+            <div class="loading-spinner"></div>
+            <h2>WMG Digital Twin Platform</h2>
+            <p>Initializing Industrial Automation Systems...</p>
+            <div class="loading-progress"></div>
+        </div>
+    </div>
+
+    <!-- Main Application Container -->
+    <div id="application-container" class="application-container hidden">
+        <!-- Header -->
+        <header class="main-header">
+            <div class="header-content">
+                <div class="header-left">
+                    <div class="wmg-brand">
+                        <div class="wmg-logo-small"></div>
+                        <div class="brand-text">
+                            <h1>WMG Digital Twin Platform</h1>
+                            <span class="header-subtitle">Industrial Automation & Reinforcement Learning</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="header-right">
+                    <div class="system-status">
+                        <div class="connection-indicator">
+                            <div id="connection-status" class="status-dot"></div>
+                            <span id="connection-text" class="status-text">Connecting...</span>
+                        </div>
+                        <div class="performance-summary">
+                            OEE: <span id="header-oee">0.0%</span> | 
+                            Efficiency: <span id="header-efficiency">0.0%</span>
+                        </div>
+                    </div>
+                </div>
+            </header>
+        </div>
+
+        <!-- Main Dashboard Layout -->
+        <main class="dashboard-layout">
+            <!-- Left Control Panel -->
+            <aside class="left-panel">
+                <!-- Training Control Section -->
+                <section class="control-section" id="training-control">
+                    <div class="section-header">
+                        <h3 class="section-title">
+                            <i class="icon-brain"></i>
+                            RL Training Control
+                        </h3>
+                        <div class="section-status">
+                            <div id="training-status" class="status-indicator"></div>
+                            <span id="training-text">Stopped</span>
+                        </div>
+                    </div>
+                    
+                    <div class="section-content">
+                        <div class="control-grid">
+                            <button id="start-training" class="primary-button">
+                                <i class="icon-play"></i>
+                                Start Training
+                            </button>
+                            <button id="stop-training" class="danger-button" disabled>
+                                <i class="icon-stop"></i>
+                                Stop Training
+                            </button>
+                            <button id="reset-system" class="secondary-button">
+                                <i class="icon-reset"></i>
+                                Reset System
+                            </button>
+                        </div>
+                        
+                        <div class="metrics-grid">
+                            <div class="metric-card">
+                                <label>Episode</label>
+                                <span id="current-episode" class="metric-value">0</span>
+                            </div>
+                            <div class="metric-card">
+                                <label>Epsilon</label>
+                                <span id="epsilon-value" class="metric-value">1.00</span>
+                            </div>
+                            <div class="metric-card">
+                                <label>Reward</label>
+                                <span id="current-reward" class="metric-value">0.0</span>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Code Generation Section -->
+                <section class="control-section" id="code-generation">
+                    <div class="section-header">
+                        <h3 class="section-title">
+                            <i class="icon-code"></i>
+                            Code Generation
+                        </h3>
+                    </div>
+                    
+                    <div class="section-content">
+                        <div class="control-grid">
+                            <button id="generate-code" class="primary-button">
+                                <i class="icon-generate"></i>
+                                Generate PLC Code
+                            </button>
+                            <button id="download-code" class="secondary-button" disabled>
+                                <i class="icon-download"></i>
+                                Download Code
+                            </button>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- System Information -->
+                <section class="control-section" id="system-info">
+                    <div class="section-header">
+                        <h3 class="section-title">
+                            <i class="icon-info"></i>
+                            System Information
+                        </h3>
+                    </div>
+                    
+                    <div class="section-content">
+                        <div class="info-grid">
+                            <div class="info-item">
+                                <label>Version</label>
+                                <span>v1.0.0</span>
+                            </div>
+                            <div class="info-item">
+                                <label>Environment</label>
+                                <span>Production</span>
+                            </div>
+                            <div class="info-item">
+                                <label>Uptime</label>
+                                <span id="system-uptime">0h 0m</span>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </aside>
+
+            <!-- Central Visualization Area -->
+            <section class="main-viewport">
+                <div class="viewport-header">
+                    <h2 class="viewport-title">Robot Digital Twin</h2>
+                    <div class="viewport-controls">
+                        <button class="view-button active" data-view="3d">3D View</button>
+                        <button class="view-button" data-view="kinematics">Kinematics</button>
+                        <button class="view-button" data-view="workspace">Workspace</button>
+                    </div>
+                </div>
+                
+                <div class="robot-container">
+                    <canvas id="robot-canvas" class="robot-canvas"></canvas>
+                    
+                    <!-- Overlay Information -->
+                    <div class="robot-overlay">
+                        <div class="coordinate-display">
+                            <div class="coord-item">
+                                <label>X:</label>
+                                <span id="robot-x">0.000</span>
+                            </div>
+                            <div class="coord-item">
+                                <label>Y:</label>
+                                <span id="robot-y">0.000</span>
+                            </div>
+                            <div class="coord-item">
+                                <label>Z:</label>
+                                <span id="robot-z">0.600</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Right Information Panel -->
+            <aside class="right-panel">
+                <!-- Performance Metrics -->
+                <section class="metrics-section" id="performance-metrics">
+                    <div class="section-header">
+                        <h3 class="section-title">
+                            <i class="icon-chart"></i>
+                            Performance Metrics
+                        </h3>
+                    </div>
+                    
+                    <div class="section-content">
+                        <div class="metric-cards">
+                            <div class="metric-card primary">
+                                <div class="metric-icon">
+                                    <i class="icon-clock"></i>
+                                </div>
+                                <div class="metric-content">
+                                    <label>Cycle Time</label>
+                                    <span id="cycle-time" class="metric-value">0.0s</span>
+                                </div>
+                            </div>
+                            
+                            <div class="metric-card success">
+                                <div class="metric-icon">
+                                    <i class="icon-production"></i>
+                                </div>
+                                <div class="metric-content">
+                                    <label>Throughput</label>
+                                    <span id="throughput" class="metric-value">0.0/min</span>
+                                </div>
+                            </div>
+                            
+                            <div class="metric-card warning">
+                                <div class="metric-icon">
+                                    <i class="icon-shield"></i>
+                                </div>
+                                <div class="metric-content">
+                                    <label>Safety Score</label>
+                                    <span id="safety-score" class="metric-value">100%</span>
+                                </div>
+                            </div>
+                            
+                            <div class="metric-card info">
+                                <div class="metric-icon">
+                                    <i class="icon-energy"></i>
+                                </div>
+                                <div class="metric-content">
+                                    <label>Energy Efficiency</label>
+                                    <span id="energy-efficiency" class="metric-value">85%</span>
+                                </div>
+                            </div>
+                            
+                            <div class="metric-card accent">
+                                <div class="metric-icon">
+                                    <i class="icon-oee"></i>
+                                </div>
+                                <div class="metric-content">
+                                    <label>OEE</label>
+                                    <span id="oee-value" class="metric-value">0.0%</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Robot Control -->
+                <section class="control-section" id="robot-control">
+                    <div class="section-header">
+                        <h3 class="section-title">
+                            <i class="icon-robot"></i>
+                            Robot Control
+                        </h3>
+                        <div class="control-mode">
+                            <button class="mode-button active" data-mode="manual">Manual</button>
+                            <button class="mode-button" data-mode="auto">Auto</button>
+                        </div>
+                    </div>
+                    
+                    <div class="section-content">
+                        <div class="joint-controls">
+                            <div class="joint-control" data-joint="0">
+                                <label>Base</label>
+                                <div class="joint-slider-container">
+                                    <input type="range" id="joint0-slider" class="joint-slider" 
+                                           min="-180" max="180" value="0" step="1">
+                                    <span id="joint0-value" class="joint-value">0°</span>
+                                </div>
+                            </div>
+                            
+                            <div class="joint-control" data-joint="1">
+                                <label>Shoulder</label>
+                                <div class="joint-slider-container">
+                                    <input type="range" id="joint1-slider" class="joint-slider" 
+                                           min="-90" max="90" value="0" step="1">
+                                    <span id="joint1-value" class="joint-value">0°</span>
+                                </div>
+                            </div>
+                            
+                            <div class="joint-control" data-joint="2">
+                                <label>Elbow</label>
+                                <div class="joint-slider-container">
+                                    <input type="range" id="joint2-slider" class="joint-slider" 
+                                           min="-135" max="40" value="0" step="1">
+                                    <span id="joint2-value" class="joint-value">0°</span>
+                                </div>
+                            </div>
+                            
+                            <div class="joint-control" data-joint="3">
+                                <label>Wrist 1</label>
+                                <div class="joint-slider-container">
+                                    <input type="range" id="joint3-slider" class="joint-slider" 
+                                           min="-180" max="180" value="0" step="1">
+                                    <span id="joint3-value" class="joint-value">0°</span>
+                                </div>
+                            </div>
+                            
+                            <div class="joint-control" data-joint="4">
+                                <label>Wrist 2</label>
+                                <div class="joint-slider-container">
+                                    <input type="range" id="joint4-slider" class="joint-slider" 
+                                           min="-120" max="120" value="0" step="1">
+                                    <span id="joint4-value" class="joint-value">0°</span>
+                                </div>
+                            </div>
+                            
+                            <div class="joint-control" data-joint="5">
+                                <label>Tool</label>
+                                <div class="joint-slider-container">
+                                    <input type="range" id="joint5-slider" class="joint-slider" 
+                                           min="-360" max="360" value="0" step="1">
+                                    <span id="joint5-value" class="joint-value">0°</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="preset-controls">
+                            <button class="preset-button" data-preset="home">Home</button>
+                            <button class="preset-button" data-preset="ready">Ready</button>
+                            <button class="preset-button" data-preset="park">Park</button>
+                        </div>
+                    </div>
+                </section>
+            </aside>
+        </main>
+
+        <!-- Bottom System Log -->
+        <footer class="system-log">
+            <div class="log-header">
+                <h3 class="log-title">
+                    <i class="icon-log"></i>
+                    System Log
+                </h3>
+                <div class="log-controls">
+                    <button class="log-button" id="clear-log">Clear</button>
+                    <button class="log-button" id="export-log">Export</button>
+                </div>
+            </div>
+            
+            <div class="log-container">
+                <div id="log-content" class="log-content">
+                    <div class="log-entry info">
+                        <span class="log-timestamp">[2025-08-02 13:11:00]</span>
+                        <span class="log-level">INFO</span>
+                        <span class="log-message">WMG Digital Twin Platform initialized successfully</span>
+                    </div>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <!-- Application Scripts -->
+    <script src="js/event-dispatcher.js"></script>
+    <script src="js/robot-controller.js"></script>
+    <script src="js/conveyor-system.js"></script>
+    <script src="js/websocket-manager.js"></script>
+    <script src="js/robot-visualizer.js"></script>
+    <script src="js/inverse-kinematics.js"></script>
+    <script src="js/main.js"></script>
+</body>
+</html>
