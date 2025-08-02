@@ -1,0 +1,569 @@
+/* WMG Digital Twin Platform - Robotics Visualization Styling */
+/* Advanced styling for 3D robot visualization and kinematic controls */
+
+/* Robot Canvas and Viewport */
+.robot-canvas {
+    width: 100%;
+    height: 100%;
+    display: block;
+    background: radial-gradient(circle at 30% 40%, rgba(0, 183, 235, 0.08) 0%, rgba(108, 29, 69, 0.05) 40%, transparent 70%);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-inset);
+    cursor: grab;
+    transition: all var(--transition-normal);
+}
+
+.robot-canvas:active {
+    cursor: grabbing;
+}
+
+.robot-canvas:focus {
+    outline: 2px solid var(--wmg-secondary);
+    outline-offset: 4px;
+}
+
+/* Robot Workspace Visualization */
+.workspace-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: var(--z-elevated);
+}
+
+.workspace-boundary {
+    position: absolute;
+    border: 2px dashed rgba(255, 184, 28, 0.5);
+    border-radius: var(--radius-round);
+    animation: workspaceRotate 20s linear infinite;
+}
+
+@keyframes workspaceRotate {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+.workspace-boundary.outer {
+    border-color: rgba(46, 204, 113, 0.6);
+    animation-duration: 30s;
+}
+
+.workspace-boundary.inner {
+    border-color: rgba(231, 76, 60, 0.6);
+    animation-duration: 15s;
+    animation-direction: reverse;
+}
+
+/* Robot Status Overlays */
+.robot-status-overlay {
+    position: absolute;
+    top: var(--spacing-md);
+    right: var(--spacing-md);
+    background: var(--glass-bg);
+    backdrop-filter: blur(15px);
+    border: var(--border-secondary);
+    border-radius: var(--radius-md);
+    padding: var(--spacing-md);
+    box-shadow: var(--shadow-secondary);
+    z-index: var(--z-elevated);
+}
+
+.robot-mode-indicator {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-xs);
+    margin-bottom: var(--spacing-sm);
+}
+
+.mode-badge {
+    padding: var(--spacing-xs) var(--spacing-sm);
+    border-radius: var(--radius-lg);
+    font-size: 0.8rem;
+    font-weight: var(--font-weight-semibold);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.mode-badge.manual {
+    background: linear-gradient(135deg, var(--wmg-accent), var(--wmg-accent-light));
+    color: white;
+}
+
+.mode-badge.automatic {
+    background: linear-gradient(135deg, var(--industrial-green), #27AE60);
+    color: white;
+}
+
+.mode-badge.training {
+    background: linear-gradient(135deg, var(--industrial-yellow), #F1C40F);
+    color: var(--wmg-primary-dark);
+}
+
+.mode-badge.error {
+    background: linear-gradient(135deg, var(--industrial-red), #C0392B);
+    color: white;
+    animation: pulse 1s infinite;
+}
+
+/* Joint Control Visualizations */
+.joint-limit-indicator {
+    position: relative;
+    height: 4px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 2px;
+    margin-top: var(--spacing-xs);
+    overflow: hidden;
+}
+
+.joint-limit-range {
+    position: absolute;
+    height: 100%;
+    background: linear-gradient(90deg, var(--industrial-red) 0%, var(--industrial-yellow) 30%, var(--industrial-green) 50%, var(--industrial-yellow) 70%, var(--industrial-red) 100%);
+    border-radius: 2px;
+}
+
+.joint-current-position {
+    position: absolute;
+    top: -2px;
+    width: 8px;
+    height: 8px;
+    background: var(--wmg-secondary);
+    border-radius: var(--radius-round);
+    box-shadow: 0 0 10px rgba(255, 184, 28, 0.8);
+    transition: left var(--transition-normal);
+}
+
+.joint-control[data-joint="0"] .joint-slider {
+    background: linear-gradient(90deg, var(--wmg-primary) 0%, var(--wmg-secondary) 50%, var(--wmg-primary) 100%);
+}
+
+.joint-control[data-joint="1"] .joint-slider {
+    background: linear-gradient(90deg, var(--wmg-accent) 0%, var(--wmg-accent-light) 50%, var(--wmg-accent) 100%);
+}
+
+.joint-control[data-joint="2"] .joint-slider {
+    background: linear-gradient(90deg, var(--industrial-green) 0%, #58D68D 50%, var(--industrial-green) 100%);
+}
+
+.joint-control[data-joint="3"] .joint-slider {
+    background: linear-gradient(90deg, var(--industrial-yellow) 0%, #F7DC6F 50%, var(--industrial-yellow) 100%);
+}
+
+.joint-control[data-joint="4"] .joint-slider {
+    background: linear-gradient(90deg, var(--industrial-orange) 0%, #FF8C69 50%, var(--industrial-orange) 100%);
+}
+
+.joint-control[data-joint="5"] .joint-slider {
+    background: linear-gradient(90deg, #9B59B6 0%, #BB8FCE 50%, #9B59B6 100%);
+}
+
+/* Kinematic Chain Visualization */
+.kinematic-chain {
+    position: absolute;
+    bottom: var(--spacing-md);
+    left: var(--spacing-md);
+    background: var(--glass-bg);
+    backdrop-filter: blur(15px);
+    border: var(--border-secondary);
+    border-radius: var(--radius-md);
+    padding: var(--spacing-md);
+    box-shadow: var(--shadow-secondary);
+    z-index: var(--z-elevated);
+}
+
+.chain-title {
+    font-size: 0.9rem;
+    font-weight: var(--font-weight-semibold);
+    color: var(--text-primary);
+    margin-bottom: var(--spacing-sm);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.chain-links {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-xs);
+}
+
+.chain-link {
+    width: 20px;
+    height: 20px;
+    border-radius: var(--radius-round);
+    background: var(--glass-bg);
+    border: 2px solid var(--text-muted);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.7rem;
+    font-weight: var(--font-weight-bold);
+    color: var(--text-muted);
+    transition: all var(--transition-normal);
+    position: relative;
+}
+
+.chain-link.active {
+    background: var(--wmg-secondary);
+    border-color: var(--wmg-secondary);
+    color: var(--wmg-primary-dark);
+    box-shadow: 0 0 15px rgba(255, 184, 28, 0.6);
+}
+
+.chain-link::after {
+    content: '';
+    position: absolute;
+    right: -8px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 6px;
+    height: 2px;
+    background: var(--text-muted);
+    transition: background var(--transition-normal);
+}
+
+.chain-link:last-child::after {
+    display: none;
+}
+
+.chain-link.active + .chain-link::after {
+    background: var(--wmg-secondary);
+}
+
+/* Robot Position Display */
+.position-display {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--spacing-sm);
+    margin-bottom: var(--spacing-sm);
+}
+
+.position-axis {
+    text-align: center;
+    padding: var(--spacing-xs);
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: var(--radius-sm);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.position-axis.x-axis {
+    border-left: 3px solid #FF6B6B;
+}
+
+.position-axis.y-axis {
+    border-left: 3px solid #4ECDC4;
+}
+
+.position-axis.z-axis {
+    border-left: 3px solid #45B7D1;
+}
+
+.axis-label {
+    font-size: 0.8rem;
+    font-weight: var(--font-weight-semibold);
+    color: var(--text-muted);
+    text-transform: uppercase;
+    margin-bottom: 2px;
+}
+
+.axis-value {
+    font-family: var(--font-family-mono);
+    font-size: 1rem;
+    font-weight: var(--font-weight-bold);
+    color: var(--text-primary);
+}
+
+/* Tool Center Point Indicator */
+.tcp-indicator {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 30px;
+    height: 30px;
+    border: 2px solid var(--wmg-secondary);
+    border-radius: var(--radius-round);
+    background: rgba(255, 184, 28, 0.2);
+    animation: tcpPulse 2s infinite;
+    pointer-events: none;
+    z-index: var(--z-elevated);
+}
+
+@keyframes tcpPulse {
+    0%, 100% {
+        transform: translate(-50%, -50%) scale(1);
+        opacity: 0.8;
+    }
+    50% {
+        transform: translate(-50%, -50%) scale(1.2);
+        opacity: 0.4;
+    }
+}
+
+.tcp-indicator::before {
+    content: 'TCP';
+    position: absolute;
+    top: -25px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 0.7rem;
+    font-weight: var(--font-weight-bold);
+    color: var(--wmg-secondary);
+    background: rgba(0, 0, 0, 0.8);
+    padding: 2px 6px;
+    border-radius: var(--radius-sm);
+}
+
+/* Motion Path Visualization */
+.motion-path {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: var(--z-base);
+}
+
+.path-segment {
+    stroke: var(--wmg-secondary);
+    stroke-width: 2;
+    fill: none;
+    opacity: 0.7;
+    animation: pathDraw 2s ease-in-out;
+}
+
+@keyframes pathDraw {
+    from {
+        stroke-dasharray: 1000;
+        stroke-dashoffset: 1000;
+    }
+    to {
+        stroke-dasharray: 1000;
+        stroke-dashoffset: 0;
+    }
+}
+
+.path-point {
+    fill: var(--wmg-accent);
+    r: 3;
+    opacity: 0.8;
+    animation: pathPointPulse 1s infinite alternate;
+}
+
+@keyframes pathPointPulse {
+    from { r: 3; }
+    to { r: 5; }
+}
+
+/* Safety Zone Indicators */
+.safety-zone {
+    position: absolute;
+    border: 3px solid var(--industrial-red);
+    border-radius: var(--radius-md);
+    background: rgba(231, 76, 60, 0.1);
+    animation: safetyBlink 2s infinite;
+    pointer-events: none;
+    z-index: var(--z-elevated);
+}
+
+@keyframes safetyBlink {
+    0%, 50% { opacity: 0.8; }
+    51%, 100% { opacity: 0.3; }
+}
+
+.safety-zone.warning {
+    border-color: var(--industrial-yellow);
+    background: rgba(241, 196, 15, 0.1);
+}
+
+.safety-zone.caution {
+    border-color: var(--wmg-accent);
+    background: rgba(0, 183, 235, 0.1);
+}
+
+/* Robot Performance Indicators */
+.performance-rings {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+    z-index: var(--z-base);
+}
+
+.performance-ring {
+    position: absolute;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: var(--radius-round);
+    animation: ringRotate 10s linear infinite;
+}
+
+.performance-ring.efficiency {
+    width: 200px;
+    height: 200px;
+    border-color: rgba(46, 204, 113, 0.3);
+    animation-duration: 15s;
+}
+
+.performance-ring.throughput {
+    width: 300px;
+    height: 300px;
+    border-color: rgba(52, 152, 219, 0.3);
+    animation-duration: 20s;
+    animation-direction: reverse;
+}
+
+.performance-ring.quality {
+    width: 400px;
+    height: 400px;
+    border-color: rgba(155, 89, 182, 0.3);
+    animation-duration: 25s;
+}
+
+@keyframes ringRotate {
+    from { transform: translate(-50%, -50%) rotate(0deg); }
+    to { transform: translate(-50%, -50%) rotate(360deg); }
+}
+
+/* Error and Warning Overlays */
+.robot-error-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(231, 76, 60, 0.1);
+    backdrop-filter: blur(5px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: var(--z-overlay);
+    animation: errorFlash 0.5s ease-in-out;
+}
+
+@keyframes errorFlash {
+    0%, 100% { opacity: 0; }
+    50% { opacity: 1; }
+}
+
+.error-message {
+    background: var(--industrial-red);
+    color: white;
+    padding: var(--spacing-md) var(--spacing-lg);
+    border-radius: var(--radius-md);
+    font-weight: var(--font-weight-semibold);
+    text-align: center;
+    box-shadow: var(--shadow-primary);
+    animation: scaleIn 0.3s ease-out;
+}
+
+/* Joint Angle Display Rings */
+.joint-angle-rings {
+    position: absolute;
+    top: var(--spacing-md);
+    left: var(--spacing-md);
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-xs);
+    z-index: var(--z-elevated);
+}
+
+.angle-ring {
+    width: 40px;
+    height: 40px;
+    border-radius: var(--radius-round);
+    background: conic-gradient(from 0deg, var(--wmg-secondary) 0deg, var(--wmg-secondary) var(--angle), rgba(255, 255, 255, 0.1) var(--angle), rgba(255, 255, 255, 0.1) 360deg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.7rem;
+    font-weight: var(--font-weight-bold);
+    color: var(--text-primary);
+    position: relative;
+    transition: all var(--transition-normal);
+}
+
+.angle-ring::before {
+    content: attr(data-joint);
+    position: absolute;
+    top: -20px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 0.6rem;
+    color: var(--text-muted);
+}
+
+.angle-ring:hover {
+    transform: scale(1.1);
+    box-shadow: 0 0 20px rgba(255, 184, 28, 0.5);
+}
+
+/* Responsive Robot Controls */
+@media (max-width: 1200px) {
+    .robot-status-overlay,
+    .kinematic-chain {
+        position: static;
+        margin-bottom: var(--spacing-md);
+    }
+    
+    .joint-angle-rings {
+        flex-direction: row;
+        gap: var(--spacing-sm);
+    }
+    
+    .angle-ring {
+        width: 35px;
+        height: 35px;
+    }
+}
+
+@media (max-width: 768px) {
+    .coordinate-display {
+        flex-direction: column;
+        gap: var(--spacing-sm);
+    }
+    
+    .performance-rings {
+        display: none;
+    }
+    
+    .robot-overlay {
+        position: static;
+        background: transparent;
+        backdrop-filter: none;
+        border: none;
+        box-shadow: none;
+        padding: var(--spacing-sm);
+    }
+    
+    .joint-control {
+        padding: var(--spacing-sm);
+    }
+    
+    .joint-slider-container {
+        flex-direction: column;
+        align-items: stretch;
+        gap: var(--spacing-xs);
+    }
+    
+    .joint-value {
+        align-self: center;
+        min-width: auto;
+    }
+}
+
+/* Print Styles for Robot Documentation */
+@media print {
+    .robot-canvas,
+    .robot-overlay,
+    .performance-rings,
+    .safety-zone {
+        display: none !important;
+    }
+    
+    .joint-controls {
+        break-inside: avoid;
+    }
+}
