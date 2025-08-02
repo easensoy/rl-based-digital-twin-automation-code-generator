@@ -3,135 +3,548 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WMG RL Digital Twin - Industrial Automation Platform</title>
+    <title>WMG RL Digital Twin Platform - University of Warwick</title>
     
-    <!-- External Dependencies -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <!-- Three.js and vendor libraries -->
+    <script src="vendor/three.js/Three.js"></script>
+    <script src="js/dat.gui.min.js"></script>
+    <script src="js/require.js"></script>
     
-    <!-- CSS Imports -->
-    <link rel="stylesheet" href="frontend/css/main.css">
-    <link rel="stylesheet" href="frontend/css/themes/wmg-theme.css">
-    <link rel="stylesheet" href="frontend/css/components/dashboard.css">
-    <link rel="stylesheet" href="frontend/css/components/controls.css">
-    <link rel="stylesheet" href="frontend/css/components/robotics.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: #1a1a1a;
+            color: #ffffff;
+            overflow: hidden;
+        }
+
+        #container {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+        }
+
+        #robot-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            background: linear-gradient(45deg, #1a1a1a 0%, #2d2d2d 100%);
+        }
+
+        .control-panel {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: rgba(0, 0, 0, 0.8);
+            padding: 20px;
+            border-radius: 10px;
+            border: 1px solid #333;
+            min-width: 300px;
+            z-index: 1000;
+        }
+
+        .panel-section {
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #444;
+        }
+
+        .panel-section:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+        }
+
+        .panel-title {
+            color: #00ff88;
+            font-size: 16px;
+            font-weight: bold;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+        }
+
+        .status-indicator {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+
+        .status-connected { background: #00ff88; }
+        .status-disconnected { background: #ff4444; }
+        .status-training { background: #ffaa00; }
+
+        .control-button {
+            background: #2d5a87;
+            border: none;
+            color: white;
+            padding: 10px 15px;
+            margin: 5px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .control-button:hover {
+            background: #4a7ba7;
+        }
+
+        .control-button:disabled {
+            background: #555;
+            cursor: not-allowed;
+        }
+
+        .control-button.danger {
+            background: #cc3333;
+        }
+
+        .control-button.danger:hover {
+            background: #dd4444;
+        }
+
+        .metric-display {
+            display: flex;
+            justify-content: space-between;
+            margin: 5px 0;
+            font-size: 14px;
+        }
+
+        .metric-value {
+            color: #00ff88;
+            font-weight: bold;
+        }
+
+        .performance-panel {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(0, 0, 0, 0.8);
+            padding: 20px;
+            border-radius: 10px;
+            border: 1px solid #333;
+            min-width: 250px;
+            z-index: 1000;
+        }
+
+        .log-panel {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            right: 20px;
+            height: 150px;
+            background: rgba(0, 0, 0, 0.9);
+            border-radius: 10px;
+            border: 1px solid #333;
+            padding: 15px;
+            z-index: 1000;
+        }
+
+        .log-content {
+            height: 100%;
+            overflow-y: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            color: #ccc;
+        }
+
+        .log-entry {
+            margin-bottom: 3px;
+        }
+
+        .log-timestamp {
+            color: #888;
+        }
+
+        .log-info { color: #00ff88; }
+        .log-warning { color: #ffaa00; }
+        .log-error { color: #ff4444; }
+
+        .robot-info {
+            position: absolute;
+            bottom: 180px;
+            right: 20px;
+            background: rgba(0, 0, 0, 0.8);
+            padding: 15px;
+            border-radius: 10px;
+            border: 1px solid #333;
+            min-width: 200px;
+            z-index: 1000;
+        }
+
+        .joint-control {
+            margin: 5px 0;
+        }
+
+        .joint-slider {
+            width: 100%;
+            margin: 5px 0;
+        }
+    </style>
 </head>
 <body>
-    <div class="loading-overlay" id="loadingOverlay">
-        <div class="loading-spinner"></div>
-        <div class="loading-content">
-            <h2>WMG RL Digital Twin Platform</h2>
-            <p>Initializing Advanced Robotics Systems...</p>
-            <div class="loading-progress" id="loadingProgress"></div>
+    <div id="container">
+        <!-- Robot 3D Visualization Canvas -->
+        <canvas id="robot-canvas"></canvas>
+        
+        <!-- Main Control Panel -->
+        <div class="control-panel">
+            <div class="panel-section">
+                <div class="panel-title">🤖 WMG Digital Twin System</div>
+                <div class="metric-display">
+                    <span>Connection:</span>
+                    <span>
+                        <span id="connection-status" class="status-indicator status-disconnected"></span>
+                        <span id="connection-text">Disconnected</span>
+                    </span>
+                </div>
+                <div class="metric-display">
+                    <span>Training:</span>
+                    <span>
+                        <span id="training-status" class="status-indicator status-disconnected"></span>
+                        <span id="training-text">Stopped</span>
+                    </span>
+                </div>
+            </div>
+
+            <div class="panel-section">
+                <div class="panel-title">🎯 RL Training Control</div>
+                <button id="start-training" class="control-button">Start Training</button>
+                <button id="stop-training" class="control-button danger" disabled>Stop Training</button>
+                <button id="reset-system" class="control-button">Reset System</button>
+                <div class="metric-display">
+                    <span>Episode:</span>
+                    <span id="current-episode" class="metric-value">0</span>
+                </div>
+                <div class="metric-display">
+                    <span>Epsilon:</span>
+                    <span id="epsilon-value" class="metric-value">1.00</span>
+                </div>
+            </div>
+
+            <div class="panel-section">
+                <div class="panel-title">🏭 Code Generation</div>
+                <button id="generate-code" class="control-button">Generate PLC Code</button>
+                <button id="download-code" class="control-button" disabled>Download Code</button>
+            </div>
+        </div>
+
+        <!-- Performance Metrics Panel -->
+        <div class="performance-panel">
+            <div class="panel-title">📊 Performance Metrics</div>
+            <div class="metric-display">
+                <span>Cycle Time:</span>
+                <span id="cycle-time" class="metric-value">0.0s</span>
+            </div>
+            <div class="metric-display">
+                <span>Throughput:</span>
+                <span id="throughput" class="metric-value">0.0/min</span>
+            </div>
+            <div class="metric-display">
+                <span>Safety Score:</span>
+                <span id="safety-score" class="metric-value">100%</span>
+            </div>
+            <div class="metric-display">
+                <span>Energy Efficiency:</span>
+                <span id="energy-efficiency" class="metric-value">85%</span>
+            </div>
+            <div class="metric-display">
+                <span>OEE:</span>
+                <span id="oee-value" class="metric-value">0.0%</span>
+            </div>
+            <div class="metric-display">
+                <span>Reward:</span>
+                <span id="current-reward" class="metric-value">0.0</span>
+            </div>
+        </div>
+
+        <!-- Robot Joint Control -->
+        <div class="robot-info">
+            <div class="panel-title">🔧 Robot Control</div>
+            <div class="joint-control">
+                <label>Base: <span id="joint0-value">0°</span></label>
+                <input type="range" id="joint0-slider" class="joint-slider" min="-180" max="180" value="0">
+            </div>
+            <div class="joint-control">
+                <label>Shoulder: <span id="joint1-value">0°</span></label>
+                <input type="range" id="joint1-slider" class="joint-slider" min="-90" max="90" value="0">
+            </div>
+            <div class="joint-control">
+                <label>Elbow: <span id="joint2-value">0°</span></label>
+                <input type="range" id="joint2-slider" class="joint-slider" min="-135" max="40" value="0">
+            </div>
+            <div class="joint-control">
+                <label>Wrist 1: <span id="joint3-value">0°</span></label>
+                <input type="range" id="joint3-slider" class="joint-slider" min="-180" max="180" value="0">
+            </div>
+            <div class="joint-control">
+                <label>Wrist 2: <span id="joint4-value">0°</span></label>
+                <input type="range" id="joint4-slider" class="joint-slider" min="-120" max="120" value="0">
+            </div>
+            <div class="joint-control">
+                <label>Tool: <span id="joint5-value">0°</span></label>
+                <input type="range" id="joint5-slider" class="joint-slider" min="-360" max="360" value="0">
+            </div>
+        </div>
+
+        <!-- System Log Panel -->
+        <div class="log-panel">
+            <div class="panel-title">📝 System Log</div>
+            <div id="log-content" class="log-content">
+                <div class="log-entry">
+                    <span class="log-timestamp">[2025-08-02 13:11:00]</span>
+                    <span class="log-info">WMG Digital Twin Platform initialized</span>
+                </div>
+            </div>
         </div>
     </div>
 
-    <header class="main-header">
-        <div class="header-content">
-            <h1>WMG RL Digital Twin Platform</h1>
-            <p class="header-subtitle">Intelligent 6-DOF Robot Optimization & Industrial Automation | University of Warwick</p>
-        </div>
-        <div class="header-status">
-            <div class="connection-indicator" id="connectionIndicator">
-                <span class="status-dot"></span>
-                <span class="status-text">Connecting...</span>
-            </div>
-        </div>
-    </header>
+    <!-- WebSocket Communication Manager -->
+    <script>
+        class WebSocketManager {
+            constructor(url) {
+                this.url = url;
+                this.ws = null;
+                this.reconnectAttempts = 0;
+                this.maxReconnectAttempts = 5;
+                this.reconnectDelay = 3000;
+                this.messageHandlers = {};
+                this.connected = false;
+            }
 
-    <main class="application-container">
-        <aside class="left-panel">
-            <section class="panel-section" id="robotControlSection">
-                <h3>Robot Cell Management</h3>
-                <div class="robot-status-list" id="robotStatusList">
-                    <!-- Robot status items will be populated by JavaScript -->
-                </div>
-            </section>
+            connect() {
+                try {
+                    this.ws = new WebSocket(this.url);
+                    
+                    this.ws.onopen = () => {
+                        this.connected = true;
+                        this.reconnectAttempts = 0;
+                        this.updateConnectionStatus(true);
+                        this.log('Connected to backend server', 'info');
+                        
+                        // Send ping to confirm connection
+                        this.sendMessage({action: 'ping'});
+                    };
 
-            <section class="panel-section" id="trainingControlSection">
-                <h3>RL Training Control</h3>
-                <div class="control-buttons">
-                    <button class="primary-button" id="startTrainingBtn">Initialize Training</button>
-                    <button class="secondary-button" id="stopTrainingBtn">Emergency Stop</button>
-                    <button class="primary-button" id="generateCodeBtn">Generate IEC 61499</button>
-                    <button class="danger-button" id="resetSystemBtn">System Reset</button>
-                </div>
-                <div class="training-progress" id="trainingProgressContainer">
-                    <div class="progress-bar">
-                        <div class="progress-fill" id="trainingProgressFill"></div>
-                    </div>
-                    <div class="progress-text" id="trainingProgressText">Ready to Start Training</div>
-                </div>
-            </section>
+                    this.ws.onmessage = (event) => {
+                        try {
+                            const data = JSON.parse(event.data);
+                            this.handleMessage(data);
+                        } catch (e) {
+                            this.log('Error parsing message: ' + e.message, 'error');
+                        }
+                    };
 
-            <section class="panel-section" id="kinematicsControlSection">
-                <h3>Inverse Kinematics Control</h3>
-                <div class="joint-controls" id="jointControlsContainer">
-                    <!-- Joint control sliders will be populated by JavaScript -->
-                </div>
-            </section>
-        </aside>
+                    this.ws.onclose = () => {
+                        this.connected = false;
+                        this.updateConnectionStatus(false);
+                        this.log('Connection lost. Attempting to reconnect...', 'warning');
+                        this.attemptReconnect();
+                    };
 
-        <div class="main-viewport" id="threejsContainer">
-            <!-- Three.js scene will be rendered here -->
-        </div>
+                    this.ws.onerror = (error) => {
+                        this.log('WebSocket error: ' + error, 'error');
+                    };
 
-        <aside class="right-panel">
-            <section class="panel-section" id="performanceSection">
-                <h3>Performance Analytics</h3>
-                <div class="metrics-grid" id="performanceMetrics">
-                    <!-- Performance metrics will be populated by JavaScript -->
-                </div>
-            </section>
+                } catch (e) {
+                    this.log('Failed to connect: ' + e.message, 'error');
+                    this.attemptReconnect();
+                }
+            }
 
-            <section class="panel-section" id="kinematicsAnalysisSection">
-                <h3>Kinematics Analysis</h3>
-                <div class="metrics-grid" id="kinematicsMetrics">
-                    <!-- Kinematics metrics will be populated by JavaScript -->
-                </div>
-            </section>
+            attemptReconnect() {
+                if (this.reconnectAttempts < this.maxReconnectAttempts) {
+                    this.reconnectAttempts++;
+                    setTimeout(() => {
+                        this.log(`Reconnection attempt ${this.reconnectAttempts}/${this.maxReconnectAttempts}`, 'info');
+                        this.connect();
+                    }, this.reconnectDelay);
+                } else {
+                    this.log('Max reconnection attempts reached', 'error');
+                }
+            }
 
-            <section class="panel-section" id="codeDisplaySection">
-                <h3>Generated IEC 61499 Code</h3>
-                <div class="code-container" id="generatedCodeDisplay">
-                    <pre><code id="generatedCodeContent">// Waiting for RL optimization to complete...
-// Generated code will appear here after training</code></pre>
-                </div>
-            </section>
+            sendMessage(message) {
+                if (this.connected && this.ws.readyState === WebSocket.OPEN) {
+                    this.ws.send(JSON.stringify(message));
+                } else {
+                    this.log('Cannot send message: not connected', 'warning');
+                }
+            }
 
-            <section class="panel-section" id="systemIntegrationSection">
-                <h3>System Integration Status</h3>
-                <div class="metrics-grid" id="systemMetrics">
-                    <!-- System integration metrics will be populated by JavaScript -->
-                </div>
-            </section>
-        </aside>
-    </main>
+            handleMessage(data) {
+                const messageType = data.type;
+                if (this.messageHandlers[messageType]) {
+                    this.messageHandlers[messageType](data);
+                } else {
+                    this.log(`Unhandled message type: ${messageType}`, 'warning');
+                }
+            }
 
-    <footer class="system-footer">
-        <div class="footer-content">
-            <div class="system-status" id="systemStatus">
-                <span class="status-indicator"></span>
-                <span class="status-message">System Initializing...</span>
-            </div>
-            <div class="performance-summary" id="performanceSummary">
-                OEE: <span id="oeeDisplay">--</span>% | 
-                Cycle Time: <span id="cycleTimeDisplay">--</span>s | 
-                Throughput: <span id="throughputDisplay">--</span> parts/hr
-            </div>
-        </div>
-    </footer>
+            onMessage(type, handler) {
+                this.messageHandlers[type] = handler;
+            }
 
-    <!-- JavaScript Module Imports -->
-    <script type="module" src="frontend/js/core/state-manager.js"></script>
-    <script type="module" src="frontend/js/core/websocket-manager.js"></script>
-    <script type="module" src="frontend/js/core/event-dispatcher.js"></script>
-    <script type="module" src="frontend/js/robotics/inverse-kinematics.js"></script>
-    <script type="module" src="frontend/js/robotics/robot-visualizer.js"></script>
-    <script type="module" src="frontend/js/robotics/conveyor-system.js"></script>
-    <script type="module" src="frontend/js/robotics/robot-controller.js"></script>
-    <script type="module" src="frontend/js/ui/performance-dashboard.js"></script>
-    <script type="module" src="frontend/js/ui/training-controls.js"></script>
-    <script type="module" src="frontend/js/ui/code-display.js"></script>
-    <script type="module" src="frontend/js/main.js"></script>
+            updateConnectionStatus(connected) {
+                const statusIndicator = document.getElementById('connection-status');
+                const statusText = document.getElementById('connection-text');
+                
+                if (connected) {
+                    statusIndicator.className = 'status-indicator status-connected';
+                    statusText.textContent = 'Connected';
+                } else {
+                    statusIndicator.className = 'status-indicator status-disconnected';
+                    statusText.textContent = 'Disconnected';
+                }
+            }
+
+            log(message, level = 'info') {
+                const logContent = document.getElementById('log-content');
+                const timestamp = new Date().toLocaleTimeString();
+                const logEntry = document.createElement('div');
+                logEntry.className = 'log-entry';
+                logEntry.innerHTML = `
+                    <span class="log-timestamp">[${timestamp}]</span>
+                    <span class="log-${level}">${message}</span>
+                `;
+                logContent.appendChild(logEntry);
+                logContent.scrollTop = logContent.scrollHeight;
+            }
+        }
+
+        // Initialize WebSocket connection (same server, different endpoint)
+        const wsManager = new WebSocketManager(`ws://${window.location.host}/ws`);
+
+        // Message handlers
+        wsManager.onMessage('training_progress', (data) => {
+            document.getElementById('current-episode').textContent = data.episode;
+            document.getElementById('epsilon-value').textContent = data.epsilon.toFixed(3);
+            document.getElementById('current-reward').textContent = data.reward.toFixed(2);
+            wsManager.log(`Episode ${data.episode}: Reward=${data.reward.toFixed(2)}`, 'info');
+        });
+
+        wsManager.onMessage('performance_update', (data) => {
+            const metrics = data.data;
+            document.getElementById('cycle-time').textContent = metrics.cycle_time.toFixed(1) + 's';
+            document.getElementById('throughput').textContent = metrics.throughput.toFixed(1) + '/min';
+            document.getElementById('safety-score').textContent = (metrics.safety_score * 100).toFixed(1) + '%';
+            document.getElementById('energy-efficiency').textContent = (metrics.energy_efficiency * 100).toFixed(1) + '%';
+            document.getElementById('oee-value').textContent = (metrics.oee * 100).toFixed(1) + '%';
+        });
+
+        wsManager.onMessage('training_status', (data) => {
+            const isTraining = data.status === 'started';
+            const statusIndicator = document.getElementById('training-status');
+            const statusText = document.getElementById('training-text');
+            
+            if (isTraining) {
+                statusIndicator.className = 'status-indicator status-training';
+                statusText.textContent = 'Active';
+                document.getElementById('start-training').disabled = true;
+                document.getElementById('stop-training').disabled = false;
+            } else {
+                statusIndicator.className = 'status-indicator status-disconnected';
+                statusText.textContent = 'Stopped';
+                document.getElementById('start-training').disabled = false;
+                document.getElementById('stop-training').disabled = true;
+            }
+            
+            wsManager.log(`Training ${data.status}`, 'info');
+        });
+
+        wsManager.onMessage('plc_code', (data) => {
+            // Store generated code for download
+            window.generatedCode = data.code;
+            document.getElementById('download-code').disabled = false;
+            wsManager.log('PLC code generated successfully', 'info');
+        });
+
+        wsManager.onMessage('pong', (data) => {
+            wsManager.log('Server ping response received', 'info');
+        });
+
+        // Control button handlers
+        document.getElementById('start-training').onclick = () => {
+            wsManager.sendMessage({action: 'start_training'});
+        };
+
+        document.getElementById('stop-training').onclick = () => {
+            wsManager.sendMessage({action: 'stop_training'});
+        };
+
+        document.getElementById('reset-system').onclick = () => {
+            wsManager.sendMessage({action: 'reset_system'});
+        };
+
+        document.getElementById('generate-code').onclick = () => {
+            wsManager.sendMessage({action: 'generate_code'});
+        };
+
+        document.getElementById('download-code').onclick = () => {
+            if (window.generatedCode) {
+                const blob = new Blob([window.generatedCode], {type: 'text/plain'});
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `wmg_optimized_${new Date().toISOString().slice(0,19).replace(/:/g,'-')}.st`;
+                a.click();
+                URL.revokeObjectURL(url);
+            }
+        };
+
+        // Joint slider handlers
+        for (let i = 0; i < 6; i++) {
+            const slider = document.getElementById(`joint${i}-slider`);
+            const valueSpan = document.getElementById(`joint${i}-value`);
+            
+            slider.oninput = () => {
+                const angle = parseInt(slider.value);
+                valueSpan.textContent = angle + '°';
+                
+                // Send robot update to backend
+                const robotData = {};
+                for (let j = 0; j < 6; j++) {
+                    const sliderEl = document.getElementById(`joint${j}-slider`);
+                    robotData[`joint${j}`] = parseInt(sliderEl.value) * Math.PI / 180; // Convert to radians
+                }
+                
+                wsManager.sendMessage({
+                    action: 'update_robot_angles',
+                    robot_data: robotData
+                });
+            };
+        }
+
+        // Initialize connection when page loads
+        document.addEventListener('DOMContentLoaded', () => {
+            wsManager.log('WMG Digital Twin Platform starting...', 'info');
+            wsManager.connect();
+            
+            // Initialize 3D robot visualization
+            if (typeof window.initRobotVisualization === 'function') {
+                window.initRobotVisualization();
+            }
+        });
+
+        // Load the existing frontend JavaScript
+        requirejs.config({
+            baseUrl: '/frontend',
+            paths: {
+                'three': '/vendor/three.js/Three'
+            }
+        });
+
+        // Load main application
+        require(['/frontend/main.js'], function(app) {
+            if (app && app.init) {
+                app.init();
+            }
+        });
+    </script>
 </body>
 </html>
