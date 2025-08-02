@@ -126,7 +126,9 @@ class WMGDigitalTwinServer:
 
     def setup_static_files(self):
         """Mount static file directories."""
-        # Serve frontend files
+        # Mount frontend subdirectories at root level
+        self.app.mount("/css", StaticFiles(directory="frontend/css"), name="css")
+        self.app.mount("/js", StaticFiles(directory="frontend/js"), name="js")
         self.app.mount("/frontend", StaticFiles(directory="frontend"), name="frontend")
         self.app.mount("/data", StaticFiles(directory="data"), name="data")
 
@@ -136,7 +138,7 @@ class WMGDigitalTwinServer:
         @self.app.get("/", response_class=HTMLResponse)
         async def serve_main_page():
             """Serve the main application page."""
-            return FileResponse("index.html")
+            return FileResponse("wmg-digital-twin.html")
         
         @self.app.get("/api/system/status")
         async def get_system_status():
