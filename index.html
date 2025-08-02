@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WMG RL Digital Twin - Industrial Automation Platform</title>
+    
+    <!-- External Dependencies -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    
+    <!-- CSS Imports -->
+    <link rel="stylesheet" href="frontend/css/main.css">
+    <link rel="stylesheet" href="frontend/css/themes/wmg-theme.css">
+    <link rel="stylesheet" href="frontend/css/components/dashboard.css">
+    <link rel="stylesheet" href="frontend/css/components/controls.css">
+    <link rel="stylesheet" href="frontend/css/components/robotics.css">
+</head>
+<body>
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-spinner"></div>
+        <div class="loading-content">
+            <h2>WMG RL Digital Twin Platform</h2>
+            <p>Initializing Advanced Robotics Systems...</p>
+            <div class="loading-progress" id="loadingProgress"></div>
+        </div>
+    </div>
+
+    <header class="main-header">
+        <div class="header-content">
+            <h1>WMG RL Digital Twin Platform</h1>
+            <p class="header-subtitle">Intelligent 6-DOF Robot Optimization & Industrial Automation | University of Warwick</p>
+        </div>
+        <div class="header-status">
+            <div class="connection-indicator" id="connectionIndicator">
+                <span class="status-dot"></span>
+                <span class="status-text">Connecting...</span>
+            </div>
+        </div>
+    </header>
+
+    <main class="application-container">
+        <aside class="left-panel">
+            <section class="panel-section" id="robotControlSection">
+                <h3>Robot Cell Management</h3>
+                <div class="robot-status-list" id="robotStatusList">
+                    <!-- Robot status items will be populated by JavaScript -->
+                </div>
+            </section>
+
+            <section class="panel-section" id="trainingControlSection">
+                <h3>RL Training Control</h3>
+                <div class="control-buttons">
+                    <button class="primary-button" id="startTrainingBtn">Initialize Training</button>
+                    <button class="secondary-button" id="stopTrainingBtn">Emergency Stop</button>
+                    <button class="primary-button" id="generateCodeBtn">Generate IEC 61499</button>
+                    <button class="danger-button" id="resetSystemBtn">System Reset</button>
+                </div>
+                <div class="training-progress" id="trainingProgressContainer">
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="trainingProgressFill"></div>
+                    </div>
+                    <div class="progress-text" id="trainingProgressText">Ready to Start Training</div>
+                </div>
+            </section>
+
+            <section class="panel-section" id="kinematicsControlSection">
+                <h3>Inverse Kinematics Control</h3>
+                <div class="joint-controls" id="jointControlsContainer">
+                    <!-- Joint control sliders will be populated by JavaScript -->
+                </div>
+            </section>
+        </aside>
+
+        <div class="main-viewport" id="threejsContainer">
+            <!-- Three.js scene will be rendered here -->
+        </div>
+
+        <aside class="right-panel">
+            <section class="panel-section" id="performanceSection">
+                <h3>Performance Analytics</h3>
+                <div class="metrics-grid" id="performanceMetrics">
+                    <!-- Performance metrics will be populated by JavaScript -->
+                </div>
+            </section>
+
+            <section class="panel-section" id="kinematicsAnalysisSection">
+                <h3>Kinematics Analysis</h3>
+                <div class="metrics-grid" id="kinematicsMetrics">
+                    <!-- Kinematics metrics will be populated by JavaScript -->
+                </div>
+            </section>
+
+            <section class="panel-section" id="codeDisplaySection">
+                <h3>Generated IEC 61499 Code</h3>
+                <div class="code-container" id="generatedCodeDisplay">
+                    <pre><code id="generatedCodeContent">// Waiting for RL optimization to complete...
+// Generated code will appear here after training</code></pre>
+                </div>
+            </section>
+
+            <section class="panel-section" id="systemIntegrationSection">
+                <h3>System Integration Status</h3>
+                <div class="metrics-grid" id="systemMetrics">
+                    <!-- System integration metrics will be populated by JavaScript -->
+                </div>
+            </section>
+        </aside>
+    </main>
+
+    <footer class="system-footer">
+        <div class="footer-content">
+            <div class="system-status" id="systemStatus">
+                <span class="status-indicator"></span>
+                <span class="status-message">System Initializing...</span>
+            </div>
+            <div class="performance-summary" id="performanceSummary">
+                OEE: <span id="oeeDisplay">--</span>% | 
+                Cycle Time: <span id="cycleTimeDisplay">--</span>s | 
+                Throughput: <span id="throughputDisplay">--</span> parts/hr
+            </div>
+        </div>
+    </footer>
+
+    <!-- JavaScript Module Imports -->
+    <script type="module" src="frontend/js/core/state-manager.js"></script>
+    <script type="module" src="frontend/js/core/websocket-manager.js"></script>
+    <script type="module" src="frontend/js/core/event-dispatcher.js"></script>
+    <script type="module" src="frontend/js/robotics/inverse-kinematics.js"></script>
+    <script type="module" src="frontend/js/robotics/robot-visualizer.js"></script>
+    <script type="module" src="frontend/js/robotics/conveyor-system.js"></script>
+    <script type="module" src="frontend/js/robotics/robot-controller.js"></script>
+    <script type="module" src="frontend/js/ui/performance-dashboard.js"></script>
+    <script type="module" src="frontend/js/ui/training-controls.js"></script>
+    <script type="module" src="frontend/js/ui/code-display.js"></script>
+    <script type="module" src="frontend/js/main.js"></script>
+</body>
+</html>
