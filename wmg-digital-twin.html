@@ -5,10 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>WMG RL Digital Twin Platform - University of Warwick</title>
     
-    <!-- External Libraries -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     
-    <!-- Essential Stylesheets -->
     <link rel="stylesheet" href="frontend/css/themes/wmg-theme.css">
     <link rel="stylesheet" href="frontend/css/components/dashboard.css">
 </head>
@@ -26,7 +24,7 @@
     <!-- Main Application -->
     <div id="application-container" class="application-container hidden">
         
-        <!-- Header -->
+        <!-- Compact Header -->
         <header class="main-header">
             <div class="header-content">
                 <div class="header-left">
@@ -53,26 +51,26 @@
             </div>
         </header>
 
-        <!-- Dashboard Layout -->
+        <!-- Optimized Dashboard Layout -->
         <main class="dashboard-layout">
             
-            <!-- Left Control Panel -->
+            <!-- Minimal Left Control Panel -->
             <aside class="left-panel">
                 
                 <!-- System Status -->
                 <section class="control-section">
                     <div class="section-header">
-                        <h3 class="section-title">🤖 WMG DIGITAL TWIN SYSTEM</h3>
+                        <h3 class="section-title">SYSTEM</h3>
                     </div>
                     <div class="section-content">
                         <div class="status-grid">
                             <div class="status-item">
                                 <label>Connection:</label>
-                                <span id="system-connection-status" class="status-value connected">●&nbsp;Connected</span>
+                                <span id="system-connection-status" class="status-value connected">Connected</span>
                             </div>
                             <div class="status-item">
                                 <label>Training:</label>
-                                <span id="system-training-status" class="status-value active">●&nbsp;Active</span>
+                                <span id="system-training-status" class="status-value active">Active</span>
                             </div>
                         </div>
                     </div>
@@ -81,14 +79,14 @@
                 <!-- RL Training Control -->
                 <section class="control-section">
                     <div class="section-header">
-                        <h3 class="section-title">🧠 RL TRAINING CONTROL</h3>
+                        <h3 class="section-title">TRAINING</h3>
                     </div>
                     
                     <div class="section-content">
                         <div class="control-buttons">
-                            <button id="start-training" class="control-btn start-btn">Start Training</button>
-                            <button id="stop-training" class="control-btn stop-btn" disabled>Stop Training</button>
-                            <button id="reset-system" class="control-btn reset-btn">Reset System</button>
+                            <button id="start-training" class="control-btn start-btn">Start</button>
+                            <button id="stop-training" class="control-btn stop-btn" disabled>Stop</button>
+                            <button id="reset-system" class="control-btn reset-btn">Reset</button>
                         </div>
                         
                         <div class="training-metrics">
@@ -107,20 +105,20 @@
                 <!-- Code Generation -->
                 <section class="control-section">
                     <div class="section-header">
-                        <h3 class="section-title">📊 CODE GENERATION</h3>
+                        <h3 class="section-title">CODE</h3>
                     </div>
                     
                     <div class="section-content">
                         <div class="control-buttons">
-                            <button id="generate-code" class="control-btn generate-btn">Generate PLC Code</button>
-                            <button id="download-code" class="control-btn download-btn" disabled>Download Code</button>
+                            <button id="generate-code" class="control-btn generate-btn">Generate</button>
+                            <button id="download-code" class="control-btn download-btn" disabled>Download</button>
                         </div>
                     </div>
                 </section>
                 
             </aside>
 
-            <!-- Central Visualization Area -->
+            <!-- Dominant Robot Visualization Area -->
             <section class="main-viewport">
                 <div class="viewport-header">
                     <h2 class="viewport-title">Robot Digital Twin</h2>
@@ -132,56 +130,56 @@
                 <div class="robot-container">
                     <canvas id="robot-canvas" class="robot-canvas"></canvas>
                     
-                    <!-- Robot Position Display -->
+                    <!-- Minimal Robot Position Display -->
                     <div class="robot-overlay">
                         <div class="coordinate-display">
                             <div class="coord-item">
                                 <label>X:</label>
-                                <span id="robot-x">-1.040</span>
+                                <span id="robot-x">1.869</span>
                             </div>
                             <div class="coord-item">
                                 <label>Y:</label>
-                                <span id="robot-y">-1.405</span>
+                                <span id="robot-y">0.707</span>
                             </div>
                             <div class="coord-item">
                                 <label>Z:</label>
-                                <span id="robot-z">0.451</span>
+                                <span id="robot-z">-0.711</span>
                             </div>
                         </div>
                     </div>
                 </div>
             </section>
 
-            <!-- Right Information Panel -->
+            <!-- Minimal Right Information Panel -->
             <aside class="right-panel">
                 
                 <!-- Performance Metrics -->
                 <section class="metrics-section">
                     <div class="section-header">
-                        <h3 class="section-title">📈 PERFORMANCE METRICS</h3>
+                        <h3 class="section-title">METRICS</h3>
                     </div>
                     
                     <div class="section-content">
                         <div class="performance-grid">
                             <div class="perf-item">
-                                <label>Cycle Time:</label>
-                                <span id="cycle-time" class="perf-value">18.7s</span>
+                                <label>Cycle:</label>
+                                <span id="cycle-time" class="perf-value">28.5s</span>
                             </div>
                             <div class="perf-item">
                                 <label>Throughput:</label>
-                                <span id="throughput" class="perf-value">2.5/min</span>
+                                <span id="throughput" class="perf-value">125/min</span>
                             </div>
                             <div class="perf-item">
-                                <label>Safety Score:</label>
-                                <span id="safety-score" class="perf-value">100.0%</span>
+                                <label>Safety:</label>
+                                <span id="safety-score" class="perf-value">100%</span>
                             </div>
                             <div class="perf-item">
-                                <label>Energy Efficiency:</label>
-                                <span id="energy-efficiency" class="perf-value">41.5%</span>
+                                <label>Energy:</label>
+                                <span id="energy-efficiency" class="perf-value">85%</span>
                             </div>
                             <div class="perf-item">
                                 <label>OEE:</label>
-                                <span id="oee-value" class="perf-value">2.0%</span>
+                                <span id="oee-value" class="perf-value">91.8%</span>
                             </div>
                             <div class="perf-item">
                                 <label>Reward:</label>
@@ -194,7 +192,7 @@
                 <!-- Robot Control -->
                 <section class="control-section">
                     <div class="section-header">
-                        <h3 class="section-title">🦾 ROBOT CONTROL</h3>
+                        <h3 class="section-title">ROBOT</h3>
                     </div>
                     
                     <div class="section-content">
@@ -240,10 +238,10 @@
                 
             </aside>
 
-            <!-- System Log -->
+            <!-- Minimal System Log -->
             <footer class="system-log">
                 <div class="log-header">
-                    <h3 class="log-title">📋 SYSTEM LOG</h3>
+                    <h3 class="log-title">SYSTEM LOG</h3>
                     <div class="log-controls">
                         <button class="log-button" id="clear-log">Clear</button>
                         <button class="log-button" id="export-log">Export</button>
@@ -294,7 +292,6 @@
         </main>
     </div>
 
-    <!-- Essential JavaScript Modules -->
     <script src="frontend/js/core/event-dispatcher.js"></script>
     <script src="frontend/js/core/websocket-manager.js"></script>
     <script src="frontend/js/robotics/inverse-kinematics.js"></script>
