@@ -1,0 +1,24 @@
+{
+  "question": "Why does seed 42 trained inside the live server (policy_snapshot_20261106_190932.pt) not reproduce offline?",
+  "offline_reproducibility": {
+    "check": "backend's own WMGDigitalTwinServer.run_training_episode, offline, seed 42  vs  multi_seed_eval.py harness, seed 42",
+    "bit_identical": true,
+    "max_abs_diff": 0.0,
+    "greedy_share": [
+      0.0,
+      0.0,
+      1.0,
+      0.0,
+      0.0,
+      0.0
+    ]
+  },
+  "server_run_vs_offline": 0.5686860680580139,
+  "mechanism_evidence": [
+    "websockets/legacy/protocol.py:858 builds keepalive ping payloads with random.getrandbits(32) from the global random module",
+    "uvicorn config.py:200 ws_ping_interval defaults to 20.0 s; a WebSocket client was connected for the whole 188.8 s run (~9 pings)",
+    "backend/rl_agent.py uses the global random module for exploration (randrange) and replay sampling (random.sample)",
+    "rng_injection_sweep.json: one injected getrandbits(32) changed the trained weights in 3 of 10 positions; the other 7 were absorbed because random.sample's rejection sampling re-synchronises the stream"
+  ],
+  "conclusion": "Most likely cause: keepalive pings consumed the agent's global random stream. P(no change from ~9 pings) ~ 0.7^9 ~ 4%. Not proven end to end (would need a server rerun with and without a connected client)."
+}
