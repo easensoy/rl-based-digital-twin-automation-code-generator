@@ -1,0 +1,29 @@
+# Virtual environments
+.venv/
+wmg_env/
+
+# Python caches and test artefacts
+__pycache__/
+*.py[cod]
+.pytest_cache/
+
+# Runtime output of the server: generated FBs, EAE builds, training logs.
+# Anchored to the root, so docs/data/ and visual_outputs/data/ stay tracked.
+/data/
+
+# Output folder used by the export command in the README
+/out/
+
+# Reference PDFs kept locally in the root
+/*.pdf
+
+# Machine-specific Claude Code files (local paths, ports, permissions)
+.claude/launch.json
+.claude/settings.local.json
+
+# Local secrets, editor and OS files
+.env
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
