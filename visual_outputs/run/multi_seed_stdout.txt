@@ -1,0 +1,41 @@
+2026-11-06 19:11:16,071 - websocket_handler - INFO - WebSocket Connection Manager initialized
+2026-11-06 19:11:16,071 - plc_generator - INFO - PLC Code Generator initialized
+2026-11-06 19:11:16,071 - main - INFO - Configuration loaded from config\config.json
+2026-11-06 19:11:16,073 - rl_agent - INFO - Automation Environment initialized
+2026-11-06 19:11:16,598 - rl_agent - INFO - DQN Agent initialized: state_size=12, action_size=6
+2026-11-06 19:11:16,598 - main - INFO - RL components initialized successfully
+2026-11-06 19:11:16,598 - main - INFO - WMG Digital Twin Server initialized successfully
+{"seed": 1, "train_seconds": 90.4, "final_epsilon": 0.00998645168764533, "gradient_steps": 1000, "train_reward_last100_mean": 1674.2460945382406, "greedy_eval_reward_mean": 1682.4633581414391, "greedy_action_share": [0.0, 0.0, 0.0, 0.0, 1.0, 0.0]}
+2026-11-06 19:12:45,667 - websocket_handler - INFO - WebSocket Connection Manager initialized
+2026-11-06 19:12:45,668 - plc_generator - INFO - PLC Code Generator initialized
+2026-11-06 19:12:45,669 - main - INFO - Configuration loaded from config\config.json
+2026-11-06 19:12:45,671 - rl_agent - INFO - Automation Environment initialized
+2026-11-06 19:12:45,674 - rl_agent - INFO - DQN Agent initialized: state_size=12, action_size=6
+2026-11-06 19:12:45,674 - main - INFO - RL components initialized successfully
+2026-11-06 19:12:45,674 - main - INFO - WMG Digital Twin Server initialized successfully
+{"seed": 2, "train_seconds": 96.4, "final_epsilon": 0.00998645168764533, "gradient_steps": 1000, "train_reward_last100_mean": 1734.096957033552, "greedy_eval_reward_mean": 1621.898551091139, "greedy_action_share": [0.0, 0.0, 1.0, 0.0, 0.0, 0.0]}
+2026-11-06 19:14:22,105 - websocket_handler - INFO - WebSocket Connection Manager initialized
+2026-11-06 19:14:22,107 - plc_generator - INFO - PLC Code Generator initialized
+2026-11-06 19:14:22,107 - main - INFO - Configuration loaded from config\config.json
+2026-11-06 19:14:22,109 - rl_agent - INFO - Automation Environment initialized
+2026-11-06 19:14:22,111 - rl_agent - INFO - DQN Agent initialized: state_size=12, action_size=6
+2026-11-06 19:14:22,111 - main - INFO - RL components initialized successfully
+2026-11-06 19:14:22,111 - main - INFO - WMG Digital Twin Server initialized successfully
+{"seed": 3, "train_seconds": 95.2, "final_epsilon": 0.00998645168764533, "gradient_steps": 1000, "train_reward_last100_mean": 1699.6225017010258, "greedy_eval_reward_mean": 1743.9344788330918, "greedy_action_share": [0.0, 0.0, 0.0, 0.0, 0.0, 1.0]}
+2026-11-06 19:15:57,261 - websocket_handler - INFO - WebSocket Connection Manager initialized
+2026-11-06 19:15:57,261 - plc_generator - INFO - PLC Code Generator initialized
+2026-11-06 19:15:57,262 - main - INFO - Configuration loaded from config\config.json
+2026-11-06 19:15:57,265 - rl_agent - INFO - Automation Environment initialized
+2026-11-06 19:15:57,269 - rl_agent - INFO - DQN Agent initialized: state_size=12, action_size=6
+2026-11-06 19:15:57,269 - main - INFO - RL components initialized successfully
+2026-11-06 19:15:57,270 - main - INFO - WMG Digital Twin Server initialized successfully
+{"seed": 4, "train_seconds": 75.0, "final_epsilon": 0.00998645168764533, "gradient_steps": 1000, "train_reward_last100_mean": 1695.0018992578919, "greedy_eval_reward_mean": 1743.9344788330918, "greedy_action_share": [0.0, 0.0, 0.0, 0.0, 0.0, 1.0]}
+2026-11-06 19:17:12,298 - websocket_handler - INFO - WebSocket Connection Manager initialized
+2026-11-06 19:17:12,298 - plc_generator - INFO - PLC Code Generator initialized
+2026-11-06 19:17:12,298 - main - INFO - Configuration loaded from config\config.json
+2026-11-06 19:17:12,300 - rl_agent - INFO - Automation Environment initialized
+2026-11-06 19:17:12,301 - rl_agent - INFO - DQN Agent initialized: state_size=12, action_size=6
+2026-11-06 19:17:12,301 - main - INFO - RL components initialized successfully
+2026-11-06 19:17:12,301 - main - INFO - WMG Digital Twin Server initialized successfully
+{"seed": 5, "train_seconds": 74.5, "final_epsilon": 0.00998645168764533, "gradient_steps": 1000, "train_reward_last100_mean": 1711.5139162959001, "greedy_eval_reward_mean": 1621.898551091139, "greedy_action_share": [0.0, 0.0, 1.0, 0.0, 0.0, 0.0]}
+wrote C:\rl-based-digital-twin-automation-code-generator\visual_outputs\run\multi_seed_check.json

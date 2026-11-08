@@ -1,0 +1,32 @@
+{
+  "seed": 42,
+  "host": "127.0.0.1",
+  "port": 8001,
+  "config": {
+    "server": {
+      "host": "0.0.0.0",
+      "port": 8000,
+      "reload": false
+    },
+    "rl_agent": {
+      "learning_rate": 0.001,
+      "batch_size": 64,
+      "memory_size": 10000,
+      "epsilon_start": 1.0,
+      "epsilon_end": 0.01,
+      "epsilon_decay": 0.995,
+      "target_update": 10
+    },
+    "automation": {
+      "cycle_time_target": 30.0,
+      "throughput_target": 120.0,
+      "safety_threshold": 0.95,
+      "energy_efficiency_target": 0.85
+    }
+  },
+  "torch": "2.1.0+cpu",
+  "numpy": "1.24.3",
+  "python": "3.11.14 (main, Dec  9 2025, 18:59:10) [MSC v.1944 64 bit (AMD64)]",
+  "device": "cpu",
+  "started": "2026-11-06 19:04:06"
+}

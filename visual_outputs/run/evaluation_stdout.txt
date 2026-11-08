@@ -1,0 +1,60 @@
+Uniform random                                reward   1715.99 ± 1.19 | energy_eff 0.5300 | quality 0.9512 | throughput 3.500 | oee 0.0278
+Untrained DQN (greedy)                        reward   1713.65 ± 1.89 | energy_eff 0.5298 | quality 0.9608 | throughput 3.120 | oee 0.0250
+Trained DQN (greedy, as backend runs it)      reward   1682.58 ± 0.14 | energy_eff 0.4768 | quality 0.9608 | throughput 3.000 | oee 0.0240
+Trained DQN (greedy, eval mode)               reward   1682.58 ± 0.14 | energy_eff 0.4768 | quality 0.9608 | throughput 3.000 | oee 0.0240
+Generated ST, as wired in main program        reward   1622.02 ± 0.14 | energy_eff 0.4078 | quality 0.9465 | throughput 2.500 | oee 0.0197
+Generated ST, fed full twin state             reward   1622.02 ± 0.14 | energy_eff 0.4078 | quality 0.9465 | throughput 2.500 | oee 0.0197
+Always 0: Conservative                        reward   1772.37 ± 0.14 | energy_eff 0.6203 | quality 0.9465 | throughput 4.000 | oee 0.0316
+Always 1: Normal                              reward   1715.54 ± 0.14 | energy_eff 0.5000 | quality 0.9750 | throughput 3.000 | oee 0.0244
+Always 2: Aggressive                          reward   1622.02 ± 0.14 | energy_eff 0.4078 | quality 0.9465 | throughput 2.500 | oee 0.0197
+Always 3: Energy saving                       reward   1827.38 ± 0.14 | energy_eff 0.7225 | quality 0.9180 | throughput 5.500 | oee 0.0421
+Always 4: Quality focus                       reward   1682.58 ± 0.14 | energy_eff 0.4768 | quality 0.9608 | throughput 3.000 | oee 0.0240
+Always 5: Balanced                            reward   1744.05 ± 0.14 | energy_eff 0.5651 | quality 0.9608 | throughput 3.500 | oee 0.0280
+{
+  "n_states": 20000,
+  "agreement_st_as_wired_vs_dqn_eval": 0.0,
+  "agreement_st_full_state_vs_dqn_eval": 0.0,
+  "agreement_dqn_train_mode_vs_eval_mode": 1.0,
+  "st_as_wired_action_share": [
+    0.0,
+    0.0,
+    1.0,
+    0.0,
+    0.0,
+    0.0
+  ],
+  "st_full_state_action_share": [
+    0.0,
+    0.0,
+    1.0,
+    0.0,
+    0.0,
+    0.0
+  ],
+  "dqn_eval_action_share": [
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    1.0,
+    0.0
+  ],
+  "q_value_mean_per_action": [
+    784.6212158203125,
+    811.9347534179688,
+    777.4609985351562,
+    765.8421020507812,
+    820.8628540039062,
+    775.0205078125
+  ],
+  "q_value_std_per_action": [
+    58.83683776855469,
+    60.8499870300293,
+    58.3034782409668,
+    57.42948532104492,
+    61.56254959106445,
+    58.07645034790039
+  ],
+  "q_gap_best_minus_second_mean": 8.931793212890625
+}
+wrote C:\rl-based-digital-twin-automation-code-generator\visual_outputs\run\evaluation.json
