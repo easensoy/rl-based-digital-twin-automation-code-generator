@@ -1,0 +1,32 @@
+kind,id,group_or_description,actions_chosen,max_abs_q_diff,q_values,action,setpoints,st_run,eae_compile_or_verdict
+network,trained_snapshot,Trained · server run (2026-11-06),4,5.4932e-04,pass,pass,pass,pass,pass
+network,legacy_seed42,Trained · default simulator (2026-11-07),2,4.8828e-04,pass,pass,pass,notrun,notrun
+network,legacy_seed1,Trained · default simulator (2026-11-07),4,7.3242e-04,pass,pass,pass,notrun,notrun
+network,legacy_seed2,Trained · default simulator (2026-11-07),2,7.3242e-04,pass,pass,pass,notrun,notrun
+network,legacy_seed3,Trained · default simulator (2026-11-07),5,6.1035e-04,pass,pass,pass,notrun,notrun
+network,legacy_seed4,Trained · default simulator (2026-11-07),5,6.1035e-04,pass,pass,pass,notrun,notrun
+network,legacy_seed5,Trained · default simulator (2026-11-07),2,5.4932e-04,pass,pass,pass,notrun,notrun
+network,speed_proportional_seed42,Trained · corrected model (2026-11-07),2,6.7139e-04,pass,pass,pass,notrun,notrun
+network,speed_proportional_seed1,Trained · corrected model (2026-11-07),1,6.1035e-04,pass,pass,pass,notrun,notrun
+network,speed_proportional_seed2,Trained · corrected model (2026-11-07),4,6.7139e-04,pass,pass,pass,notrun,notrun
+network,speed_proportional_seed3,Trained · corrected model (2026-11-07),2,5.4932e-04,pass,pass,pass,notrun,notrun
+network,speed_proportional_seed4,Trained · corrected model (2026-11-07),4,4.8828e-04,pass,pass,pass,notrun,notrun
+network,speed_proportional_seed5,Trained · corrected model (2026-11-07),2 4,7.3242e-04,pass,reject,reject,notrun,notrun
+network,synthetic_seed0,Untrained · random initialisation,0 1 2 3 4 5,7.4506e-08,pass,pass,pass,notrun,pass
+network,synthetic_seed1,Untrained · random initialisation,0 1 2 3 4 5,8.9407e-08,pass,pass,pass,notrun,notrun
+network,synthetic_seed2,Untrained · random initialisation,0 4 5,1.1921e-07,pass,pass,pass,notrun,notrun
+network,synthetic_seed3,Untrained · random initialisation,5,1.4901e-07,pass,pass,pass,notrun,notrun
+network,synthetic_seed4,Untrained · random initialisation,0 3 4 5,7.4506e-08,pass,pass,pass,notrun,notrun
+defect,trained_snapshot:no_latch,one WITH input removed,,1.1218e+02,fails,passes,passes,rejected
+defect,synthetic_seed0:no_latch,one WITH input removed,,7.0158e-02,fails,fails,fails,rejected
+defect,trained_snapshot:relu,ReLU missing in a block,,3.5413e-01,fails,passes,passes,rejected
+defect,synthetic_seed0:relu,ReLU missing in a block,,8.5061e-02,fails,fails,fails,rejected
+defect,trained_snapshot:row,one weight row skipped,,9.1499e+00,fails,passes,passes,rejected
+defect,synthetic_seed0:row,one weight row skipped,,3.4994e-02,fails,fails,fails,rejected
+defect,trained_snapshot:setpoint,wrong setpoint literal,,5.4932e-04,passes,passes,fails,rejected
+defect,synthetic_seed0:setpoint,wrong setpoint literal,,7.4506e-08,passes,passes,fails,rejected
+defect,trained_snapshot:argmin,argmax → argmin,,5.4932e-04,passes,fails,fails,rejected
+defect,synthetic_seed0:argmin,argmax → argmin,,7.4506e-08,passes,fails,fails,rejected
+compiler_negative_control,undeclared variable,ERR_NO_SUCH_VAR,,,,,,,rejected
+compiler_negative_control,REAL assigned to INT,ERR_CAST_UNDEFINED,,,,,,,rejected
+compiler_negative_control,weight array one value short,WRN_FBTYPE_XMLPARSER,,,,,,,rejected
