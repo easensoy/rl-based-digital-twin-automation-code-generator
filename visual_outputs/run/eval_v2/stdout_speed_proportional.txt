@@ -1,0 +1,8 @@
+[speed_proportional] baselines done; best fixed action = Always 3: Energy saving (1771.6)
+[speed_proportional] seed 42: 1639.8 reward, Aggressive 100%, vs random -66.3, vs best fixed -131.8 (120.2 s)
+[speed_proportional] seed 1: 1715.5 reward, Normal 100%, vs random +9.5, vs best fixed -56.0 (117.0 s)
+[speed_proportional] seed 2: 1691.1 reward, Quality focus 100%, vs random -15.0, vs best fixed -80.5 (116.9 s)
+[speed_proportional] seed 3: 1639.8 reward, Aggressive 100%, vs random -66.3, vs best fixed -131.8 (117.8 s)
+[speed_proportional] seed 4: 1691.1 reward, Quality focus 100%, vs random -15.0, vs best fixed -80.5 (122.6 s)
+[speed_proportional] seed 5: 1639.8 reward, Aggressive 100%, vs random -66.3, vs best fixed -131.8 (122.9 s)
+[speed_proportional] across 6 seeds: reward 1669.5 ± 35.4 (t-CI over seeds); vs best fixed -102.1; single-action policies 6/6; beat random 1/6; wall 724.0 s
