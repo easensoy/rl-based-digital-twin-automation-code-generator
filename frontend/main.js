@@ -8,7 +8,7 @@ class WMGDigitalTwin {
     constructor() {
         this.isInitialized = false;
         this.isTraining = false;
-        this.connectionStatus = 'disconnected';
+        this.connectionStatus = 'connecting'; // 'connecting' | 'connected' | 'disconnected'
         this.websocketManager = null;
         this.scene = null;
         this.camera = null;
@@ -16,17 +16,22 @@ class WMGDigitalTwin {
         this.robotGroup = null;
         this.robotJoints = [];
         this.animationMixer = null;
-        
-        // Performance metrics
+        this.codeExport = null; // last reply of POST /api/code/generate
+
+        // Telemetry of the last training episode, as the server reports it; null (shown
+        // as "—") until it arrives. Fractions stay fractions here and become % on display.
         this.metrics = {
-            oee: 91.8,
-            efficiency: 87.4,
-            cycleTime: 28.5,
-            throughput: 125.0,
-            safetyScore: 100.0,
-            energyEfficiency: 85.0
+            cycleCounter: null, // AutomationEnvironment.cycle_time at the end of the episode (steps)
+            throughput: null,   // parts per 100 simulation steps
+            safety: null,       // safety_score, 0..1
+            energy: null,       // energy_efficiency, 0..1
+            oee: null,          // 0..1
+            reward: null        // total reward of the episode
         };
-        
+        this.training = { episodes: null, epsilon: null };
+        this.telemetryState = 'none'; // 'none' | 'live' | 'stale' (connection lost since)
+        this.staleSince = null;
+
         // Robot joint angles in degrees
         this.jointAngles = [-38, 26, -33, -11, 60, -14];
         
@@ -58,45 +63,59 @@ class WMGDigitalTwin {
         } catch (error) {
             console.error('Initialization failed:', error);
             this.addLogEntry('error', 'Initialization failed: ' + error.message);
-            // Still show the application in simulation mode
             this.showApplication();
-            this.startSimulationMode();
         }
     }
 
+    // The backend serves this page at "/", so talk to the server the page came from;
+    // a page opened as a file uses the default backend address.
+    serverOrigin() {
+        return /^https?:$/.test(window.location.protocol) ? window.location.origin : 'http://localhost:8000';
+    }
+
     async initializeWebSocket() {
-        try {
-            if (typeof WebSocketManager !== 'undefined') {
-                this.websocketManager = new WebSocketManager('ws://localhost:8000/ws');
-                
-                // Set connection timeout
-                const timeout = new Promise((_, reject) => 
-                    setTimeout(() => reject(new Error('Connection timeout')), 3000)
-                );
-                
-                await Promise.race([this.websocketManager.connect(), timeout]);
-                
-                this.connectionStatus = 'connected';
-                this.addLogEntry('success', 'WebSocket connected successfully');
-                
-                // Setup message handlers
-                this.websocketManager.onMessage('training_progress', (data) => {
-                    this.updateTrainingProgress(data);
-                });
-                
-                this.websocketManager.onMessage('performance_update', (data) => {
-                    this.updateMetrics(data.data);
-                });
-                
-            } else {
-                throw new Error('WebSocketManager not available');
+        if (typeof WebSocketManager === 'undefined') {
+            this.connectionStatus = 'disconnected';
+            this.addLogEntry('error', 'websocket-manager.js did not load: no connection to the training server');
+            this.updateConnectionStatus();
+            return;
+        }
+        const ws = new WebSocketManager(this.serverOrigin().replace(/^http/, 'ws') + '/ws');
+        this.websocketManager = ws;
+
+        // Registered before connecting, so they also serve the manager's own reconnections
+        ws.onMessage('system_state', (message) => this.onSystemState(message.data || {}));
+        ws.onMessage('training_status', (message) => this.onTrainingStatus(message.status));
+        ws.onMessage('training_complete', () => this.onTrainingStatus('completed'));
+        ws.onMessage('training_progress', (message) => this.onTrainingProgress(message));
+        ws.onMessage('performance_update', (message) => this.onPerformanceUpdate(message.data || {}));
+        ws.onMessage('system_reset', () => this.onSystemReset());
+        ws.addEventListener('connect', () => {
+            this.connectionStatus = 'connected';
+            this.updateConnectionStatus();
+            this.addLogEntry('success', 'Connected to the training server');
+        });
+        ws.addEventListener('disconnect', () => {
+            const wasConnected = this.connectionStatus === 'connected';
+            this.connectionStatus = 'disconnected';
+            this.markTelemetryStale();
+            this.updateConnectionStatus();
+            if (wasConnected) {
+                this.addLogEntry('warning', 'Connection to the training server lost; the values shown are stale');
             }
+        });
+
+        try {
+            const timeout = new Promise((_, reject) =>
+                setTimeout(() => reject(new Error('Connection timeout')), 3000));
+            await Promise.race([ws.connect(), timeout]);
         } catch (error) {
             console.warn('WebSocket connection failed:', error);
-            this.connectionStatus = 'simulation';
-            this.addLogEntry('warning', 'Running in simulation mode - backend not connected');
+            if (this.connectionStatus !== 'connected') {
+                this.connectionStatus = 'disconnected';
+                this.addLogEntry('warning', 'Training server not reachable; retrying in the background');
+            }
         }
-        
         this.updateConnectionStatus();
     }
 
@@ -157,7 +176,7 @@ class WMGDigitalTwin {
             console.log('Lighting and grid added');
 
             // Create robot model
-            this.createSimpleRobot();
+            this.createAdvancedRobot();
 
             // Add camera controls
             this.addCameraControls();
@@ -171,9 +190,6 @@ class WMGDigitalTwin {
         } catch (error) {
             console.error('3D initialization failed:', error);
             this.addLogEntry('error', '3D initialization failed: ' + error.message);
-            
-            // Try to create a fallback canvas message
-            this.createFallbackCanvas();
         }
     }
 
@@ -414,7 +430,9 @@ class WMGDigitalTwin {
         
         // Code generation
         document.getElementById('generate-code')?.addEventListener('click', () => this.generateCode());
-        
+        document.getElementById('download-fbt')?.addEventListener('click', () => this.downloadCode('fbt'));
+        document.getElementById('download-st')?.addEventListener('click', () => this.downloadCode('st'));
+
         // Joint controls with enhanced robot animation
         for (let i = 0; i < 6; i++) {
             const slider = document.getElementById(`joint${i}-slider`);
@@ -433,21 +451,13 @@ class WMGDigitalTwin {
     }
 
     startUpdateLoops() {
-        // Update metrics display every 2 seconds
-        setInterval(() => {
-            this.updateMetricsDisplay();
-        }, 2000);
-        
+        // Telemetry is redrawn when the server sends it (see initializeWebSocket)
+
         // Update robot animation every 100ms
         setInterval(() => {
             this.updateRobotAnimation();
         }, 100);
-        
-        // Update coordinates every 200ms
-        setInterval(() => {
-            this.updateCoordinates();
-        }, 200);
-        
+
         // Update robot joint visualization
         setInterval(() => {
             this.updateRobotJoints();
@@ -486,127 +496,283 @@ class WMGDigitalTwin {
         
         // Initialize display values
         this.updateMetricsDisplay();
+        this.updateTrainingDisplay();
         this.updateConnectionStatus();
         this.updateJointDisplays();
     }
 
-    startSimulationMode() {
-        console.log('Starting enhanced simulation mode...');
-        
-        // Simulate realistic changing metrics
-        setInterval(() => {
-            this.metrics.oee = 85 + Math.random() * 15;
-            this.metrics.efficiency = 80 + Math.random() * 20;
-            this.metrics.cycleTime = 25 + Math.random() * 10;
-            this.metrics.throughput = 100 + Math.random() * 50;
-            this.metrics.safetyScore = 95 + Math.random() * 5;
-            this.metrics.energyEfficiency = 80 + Math.random() * 15;
-        }, 3000);
-        
-        // Simulate robot joint movement
-        setInterval(() => {
-            if (this.isTraining) {
-                for (let i = 0; i < this.jointAngles.length; i++) {
-                    this.jointAngles[i] += (Math.random() - 0.5) * 2;
-                    this.jointAngles[i] = Math.max(-180, Math.min(180, this.jointAngles[i]));
-                }
-                this.updateJointDisplays();
-            }
-        }, 500);
+    // Training runs on the server only: the buttons send the request, and the page
+    // shows what the server reports back (training_status, system_reset).
+    sendToServer(action, what) {
+        if (this.connectionStatus !== 'connected' || !this.websocketManager) {
+            this.addLogEntry('warning', `${what}: not connected to the training server`);
+            return false;
+        }
+        this.websocketManager.send({ action });
+        return true;
     }
 
     async startTraining() {
-        this.isTraining = true;
-        
-        document.getElementById('start-training').disabled = true;
-        document.getElementById('stop-training').disabled = false;
-        
-        this.updateTrainingStatus('Running');
-        this.addLogEntry('info', 'RL training started - robot motion active');
-        
-        if (this.websocketManager) {
-            this.websocketManager.send({ action: 'start_training' });
-        } else {
-            this.simulateTraining();
-        }
+        this.sendToServer('start_training', 'Start');
     }
 
     async stopTraining() {
-        this.isTraining = false;
-        
-        document.getElementById('start-training').disabled = false;
-        document.getElementById('stop-training').disabled = true;
-        
-        this.updateTrainingStatus('Stopped');
-        this.addLogEntry('info', 'RL training stopped - robot motion paused');
-        
-        if (this.websocketManager) {
-            this.websocketManager.send({ action: 'stop_training' });
-        }
-    }
-
-    simulateTraining() {
-        let episode = 0;
-        let epsilon = 1.0;
-        
-        const interval = setInterval(() => {
-            if (!this.isTraining) {
-                clearInterval(interval);
-                return;
-            }
-            
-            episode++;
-            epsilon = Math.max(0.01, epsilon * 0.995);
-            const reward = 1500 + Math.random() * 300 - 150;
-            
-            this.updateTrainingMetrics(episode, epsilon, reward);
-            
-            if (episode >= 1000) {
-                this.stopTraining();
-            }
-        }, 100);
+        this.sendToServer('stop_training', 'Stop');
     }
 
     async resetSystem() {
-        this.isTraining = false;
-        this.updateTrainingStatus('Stopped');
-        this.updateTrainingMetrics(0, 1.0, 0);
-        
-        // Reset robot to home position
+        // The robot pose in the 3D view belongs to this page
         this.jointAngles = [0, 0, 0, 0, 0, 0];
         this.updateJointDisplays();
-        
-        this.addLogEntry('info', 'System reset completed - robot returned to home position');
-        
-        if (this.websocketManager) {
-            this.websocketManager.send({ action: 'reset_system' });
+        this.sendToServer('reset_system', 'Reset');
+    }
+
+    onSystemState(state) {
+        this.setTrainingRunning(Boolean(state.training_active));
+        if (Number.isFinite(state.current_episode)) {
+            this.training.episodes = state.current_episode;
         }
+        this.updateTrainingDisplay();
+    }
+
+    onTrainingStatus(status) {
+        const running = status === 'started';
+        this.setTrainingRunning(running, status === 'completed' ? 'Completed' : null);
+        this.addLogEntry('info', running ? 'RL training started on the server'
+            : status === 'completed' ? 'RL training completed on the server' : 'RL training stopped on the server');
+    }
+
+    setTrainingRunning(running, label = null) {
+        this.isTraining = running;
+        document.getElementById('start-training').disabled = running;
+        document.getElementById('stop-training').disabled = !running;
+        this.updateTrainingStatus(label || (running ? 'Running' : 'Stopped'));
+    }
+
+    // training_progress (backend/main.py broadcast_training_progress): "episode" is the
+    // 0-based index of the episode that just finished.
+    onTrainingProgress(message) {
+        this.training = { episodes: message.episode + 1, epsilon: message.epsilon };
+        this.metrics.reward = Number.isFinite(message.reward) ? message.reward : null;
+        this.setTelemetryLive();
+        if (this.training.episodes % 25 === 0 && this.metrics.reward !== null) {
+            this.addLogEntry('info', `Episode ${this.training.episodes}: reward ${this.metrics.reward.toFixed(2)}`);
+        }
+    }
+
+    // performance_update (backend/main.py broadcast_performance_update): snake_case
+    // fields of AutomationEnvironment.get_performance_metrics(), mapped one by one.
+    onPerformanceUpdate(data) {
+        const number = (value) => (typeof value === 'number' && Number.isFinite(value) ? value : null);
+        Object.assign(this.metrics, {
+            cycleCounter: number(data.cycle_time),
+            throughput: number(data.throughput),
+            safety: number(data.safety_score),
+            energy: number(data.energy_efficiency),
+            oee: number(data.oee)
+        });
+        this.setTelemetryLive();
+    }
+
+    onSystemReset() {
+        Object.keys(this.metrics).forEach((key) => { this.metrics[key] = null; });
+        this.training = { episodes: 0, epsilon: null };
+        this.telemetryState = 'none';
+        this.setTrainingRunning(false);
+        this.updateTrainingDisplay();
+        this.updateMetricsDisplay();
+        this.addLogEntry('info', 'Training system reset on the server');
+    }
+
+    setTelemetryLive() {
+        this.telemetryState = 'live';
+        this.staleSince = null;
+        this.updateTrainingDisplay();
+        this.updateMetricsDisplay();
+    }
+
+    markTelemetryStale() {
+        if (this.telemetryState === 'live') {
+            this.telemetryState = 'stale';
+            this.staleSince = new Date();
+        }
+        this.updateTrainingStatus('Unknown');
+        this.updateTrainingDisplay();
+        this.updateMetricsDisplay();
     }
 
     async generateCode() {
         const generateBtn = document.getElementById('generate-code');
-        const downloadBtn = document.getElementById('download-code');
-        
         generateBtn.disabled = true;
         generateBtn.textContent = 'Generating...';
-        
+        this.showCodeError(null);
+
         try {
-            if (this.websocketManager) {
-                this.websocketManager.send({ action: 'generate_code' });
-            } else {
-                // Simulate code generation
-                setTimeout(() => {
-                    generateBtn.disabled = false;
-                    generateBtn.textContent = 'Generate';
-                    downloadBtn.disabled = false;
-                    this.addLogEntry('success', 'IEC 61499 PLC code generated successfully');
-                }, 2000);
-            }
+            this.showCodeExport(await this.requestCodeGeneration());
         } catch (error) {
+            const message = 'Code generation failed: ' + error.message;
+            this.showCodeError(message);
+            this.addLogEntry('error', this.escapeHtml(this.shorten(message, 600)));
+        } finally {
             generateBtn.disabled = false;
             generateBtn.textContent = 'Generate';
-            this.addLogEntry('error', 'Code generation failed: ' + error.message);
         }
+    }
+
+    // POST /api/code/generate exports the trained Q-network as an IEC 61499 Basic FB and checks
+    // the FB against the network. It is called over HTTP rather than as the WebSocket action so
+    // that the reply, or the reason generation failed, comes back to this request.
+    async requestCodeGeneration() {
+        let response;
+        try {
+            response = await fetch(this.serverOrigin() + '/api/code/generate', { method: 'POST' });
+        } catch (error) {
+            throw new Error(`cannot reach the server at ${this.serverOrigin()}`);
+        }
+        const body = await response.json().catch(() => ({}));
+        if (response.ok) {
+            return body;
+        }
+        if (body.detail === 'Model not trained') {
+            throw new Error('the model is not trained yet. Start training, then generate again after a few episodes.');
+        }
+        throw new Error(body.detail || `the server answered ${response.status} ${response.statusText}`);
+    }
+
+    showCodeExport(result) {
+        this.codeExport = result;
+        const count = (n) => Number(n).toLocaleString('en-GB');
+        const check = result.verification;
+        const eae = result.eae_compile;
+        const files = result.files || {};
+
+        this.setCodeField('code-fb-type', result.fb_type || '-', result.format || '');
+        this.setCodeField('code-network', (result.network || []).join('-') || '-',
+            result.parameters ? `${count(result.parameters)} parameters` : '');
+        this.setCodeField('code-macs', result.macs_per_decision ? count(result.macs_per_decision) : '-',
+            'Multiply-accumulates per decision (one REQ event)');
+
+        let summary = 'not checked against the network';
+        if (check) {
+            // The server only keeps an FB whose check passed: Q-values, argmax and setpoints
+            const agreement = `${+(check.argmax_agreement * 100).toFixed(2)}%`;
+            const ties = check.near_tie_disagreements
+                ? ` (${check.near_tie_disagreements} near-tie differences within ${check.tie_tolerance} excused)` : '';
+            const qDiff = check.max_abs_q_diff.toExponential(1);
+            const title = `The generated .fbt was run on ${count(check.states)} recent replay-buffer states and `
+                + `compared with the network: same action on ${agreement} of them${ties}, largest Q-value difference `
+                + `${check.max_abs_q_diff.toExponential(2)} (limit ${check.q_tolerance}), `
+                + `${count(check.setpoint_mismatches || 0)} states with setpoints other than the action table's`;
+            this.setCodeField('code-check', `${count(check.states)} states`, title, check.ok ? 'ok' : 'failed');
+            this.setCodeField('code-agreement', agreement + (check.near_tie_disagreements ? '*' : ''), title);
+            this.setCodeField('code-q-diff', qDiff, title);
+            summary = `same action as the network on ${agreement} of ${count(check.states)} states${ties}, `
+                + `max |ΔQ| ${qDiff}, setpoints as in the action table`;
+        } else {
+            this.setCodeField('code-check', 'not checked', 'There were no replay-buffer states to check the FB on', 'warn');
+            this.setCodeField('code-agreement', '-');
+            this.setCodeField('code-q-diff', '-');
+        }
+
+        // FBTypeCompiler's verdict on the type only: no EAE solution import, no controller run
+        const errors = eae?.errors || [];
+        const warnings = eae?.warnings || [];
+        const known = eae?.context_messages || [];
+        if (eae) {
+            const title = eae.ok
+                ? `FBTypeCompiler accepted the type: ${count(eae.bin_bytes)} B .bin; ${known.length} known `
+                    + 'standalone-compile messages. This is the FB type compiler only: the FB was not imported '
+                    + 'into an EAE solution or run on a controller.'
+                : `FBTypeCompiler rejected the type (exit code ${eae.exit_code}): ${errors.length} errors, `
+                    + `${warnings.length} warnings`;
+            this.setCodeField('code-eae', eae.ok ? 'accepted' : 'rejected', title, eae.ok ? 'ok' : 'failed');
+            if (eae.ok) summary += `; FBTypeCompiler accepted the type (${known.length} known standalone-compile messages)`;
+        } else {
+            this.setCodeField('code-eae', 'not run', 'EAE FBTypeCompiler was not found on the server, or eae_check is off');
+        }
+        this.showCompilerMessages(eae);
+
+        const folder = (files.fbt || '').replace(/[\\/][^\\/]*$/, '');
+        const folderElement = document.getElementById('code-folder');
+        if (folderElement) folderElement.textContent = folder ? `Saved on the server in ${folder}` : '';
+        document.getElementById('code-result')?.classList.remove('hidden');
+
+        const downloads = result.downloads || {};
+        document.getElementById('download-fbt').disabled = !downloads.fbt;
+        document.getElementById('download-st').disabled = !downloads.st;
+
+        this.addLogEntry('success', this.escapeHtml(`IEC 61499 FB ${result.fb_type} generated: ${summary}`));
+        if (eae && !eae.ok) {
+            this.addLogEntry('warning', this.escapeHtml(
+                `FBTypeCompiler rejected the type: ${errors[0] || warnings[0] || 'exit code ' + eae.exit_code}`));
+        }
+    }
+
+    // Every message line the compiler printed, in the server's three groups. Lines that
+    // echo a whole array initialiser are shortened on screen only; the API keeps them whole.
+    showCompilerMessages(eae) {
+        const box = document.getElementById('code-eae-messages');
+        if (!box) return;
+        const groups = eae ? [['errors', eae.errors || []], ['warnings', eae.warnings || []],
+            ['known standalone-compile messages', eae.context_messages || []]] : [];
+        const total = groups.reduce((n, [, lines]) => n + lines.length, 0);
+        box.classList.toggle('hidden', total === 0);
+        if (!total) return;
+        const limit = 200;
+        const shorten = (line) => (line.length > limit
+            ? `${line.slice(0, limit)} … [${(line.length - limit).toLocaleString('en-GB')} more characters]` : line);
+        document.getElementById('code-eae-messages-title').textContent =
+            'Compiler messages: ' + groups.map(([name, lines]) => `${lines.length} ${name}`).join(', ');
+        document.getElementById('code-eae-messages-text').textContent = groups
+            .filter(([, lines]) => lines.length)
+            .map(([name, lines]) => `${name[0].toUpperCase()}${name.slice(1)} (${lines.length}):\n`
+                + lines.map(shorten).join('\n'))
+            .join('\n\n');
+    }
+
+    setCodeField(id, text, title = '', state = '') {
+        const element = document.getElementById(id);
+        if (!element) return;
+        element.textContent = text;
+        element.title = title;
+        element.classList.remove('ok', 'warn', 'failed');
+        if (state) element.classList.add(state);
+    }
+
+    showCodeError(message) {
+        const element = document.getElementById('code-error');
+        if (!element) return;
+        const text = message || '';
+        element.textContent = this.shorten(text, 320); // a failed check carries the whole report
+        element.title = text;
+        element.classList.toggle('hidden', !text);
+    }
+
+    shorten(text, limit) {
+        return text.length > limit ? `${text.slice(0, limit)} …` : text;
+    }
+
+    // Save one of the generated files from the server's download URL (GET /api/code/files/...).
+    downloadCode(kind) {
+        const url = this.codeExport?.downloads?.[kind];
+        if (!url) return;
+        const name = decodeURIComponent(url.split('/').pop());
+        this.saveFile(this.serverOrigin() + url, name);
+        this.addLogEntry('info', this.escapeHtml(`Downloading ${name}`));
+    }
+
+    saveFile(href, name) {
+        const link = document.createElement('a');
+        link.href = href;
+        link.download = name;
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+    }
+
+    escapeHtml(text) {
+        const entities = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' };
+        return String(text).replace(/[&<>"']/g, (c) => entities[c]);
     }
 
     handleJointChange(jointIndex, value) {
@@ -682,24 +848,16 @@ class WMGDigitalTwin {
     }
 
     updateConnectionStatus() {
+        const connected = this.connectionStatus === 'connected';
+        const text = connected ? 'Connected' : this.connectionStatus === 'connecting' ? 'Connecting...' : 'Disconnected';
         const statusDot = document.getElementById('connection-status');
         const statusText = document.getElementById('connection-text');
-        
-        if (statusDot && statusText) {
-            statusDot.className = 'status-dot';
-            
-            switch (this.connectionStatus) {
-                case 'connected':
-                    statusDot.classList.add('connected');
-                    statusText.textContent = 'Connected';
-                    break;
-                case 'simulation':
-                    statusDot.classList.add('warning');
-                    statusText.textContent = 'Simulation';
-                    break;
-                default:
-                    statusText.textContent = 'Disconnected';
-            }
+        if (statusDot) statusDot.className = 'status-dot' + (connected ? ' connected' : '');
+        if (statusText) statusText.textContent = text;
+        const panelStatus = document.getElementById('system-connection-status');
+        if (panelStatus) {
+            panelStatus.textContent = text;
+            panelStatus.className = 'status-value' + (connected ? ' connected' : ' disconnected');
         }
     }
 
@@ -707,45 +865,49 @@ class WMGDigitalTwin {
         const statusEl = document.getElementById('system-training-status');
         if (statusEl) {
             statusEl.textContent = status;
-            statusEl.className = 'status-value';
-            if (status === 'Running') {
-                statusEl.classList.add('active');
-            } else {
-                statusEl.classList.add('connected');
-            }
+            statusEl.className = 'status-value' + (status === 'Running' ? ' active' : status === 'Unknown' ? '' : ' connected');
         }
     }
 
-    updateTrainingMetrics(episode, epsilon, reward) {
-        const episodeEl = document.getElementById('current-episode');
-        const epsilonEl = document.getElementById('epsilon-value');
-        const rewardEl = document.getElementById('current-reward');
-        
-        if (episodeEl) episodeEl.textContent = episode;
-        if (epsilonEl) epsilonEl.textContent = epsilon.toFixed(3);
-        if (rewardEl) rewardEl.textContent = reward.toFixed(1);
-        
-        // Add log entry for significant episodes
-        if (episode % 25 === 0) {
-            this.addLogEntry('info', `Episode ${episode}: Reward=${reward.toFixed(2)}`);
-        }
+    updateTrainingDisplay() {
+        const { episodes, epsilon } = this.training;
+        this.setTelemetryText('current-episode', episodes == null ? '—' : String(episodes));
+        this.setTelemetryText('epsilon-value', epsilon == null ? '—' : epsilon.toFixed(3));
     }
 
     updateMetricsDisplay() {
-        const elements = {
-            'header-oee': this.metrics.oee.toFixed(1) + '%',
-            'header-efficiency': this.metrics.efficiency.toFixed(1) + '%',
-            'cycle-time': this.metrics.cycleTime.toFixed(1) + 's',
-            'throughput': this.metrics.throughput.toFixed(0) + '/min',
-            'safety-score': this.metrics.safetyScore.toFixed(0) + '%',
-            'energy-efficiency': this.metrics.energyEfficiency.toFixed(0) + '%',
-            'oee-value': this.metrics.oee.toFixed(1) + '%'
+        const m = this.metrics;
+        const percent = (value, digits) => (value == null ? '—' : `${(value * 100).toFixed(digits)}%`);
+        const fixed = (value, digits, unit = '') => (value == null ? '—' : `${value.toFixed(digits)}${unit}`);
+        const values = {
+            'header-oee': percent(m.oee, 1),
+            'header-energy': percent(m.energy, 0),
+            'cycle-time': fixed(m.cycleCounter, 1),
+            'throughput': fixed(m.throughput, 1, ' /100 steps'),
+            'safety-score': percent(m.safety, 0),
+            'energy-efficiency': percent(m.energy, 0),
+            'oee-value': percent(m.oee, 1),
+            'current-reward': fixed(m.reward, 1)
         };
-        
-        Object.entries(elements).forEach(([id, value]) => {
-            const element = document.getElementById(id);
-            if (element) element.textContent = value;
-        });
+        Object.entries(values).forEach(([id, text]) => this.setTelemetryText(id, text));
+
+        const badge = document.getElementById('telemetry-state');
+        if (badge) {
+            badge.textContent = { none: 'no data', live: 'live', stale: 'stale' }[this.telemetryState];
+            badge.className = `telemetry-state ${this.telemetryState}`;
+            badge.title = this.telemetryState === 'stale'
+                ? `Connection lost at ${this.staleSince.toLocaleTimeString()}: these values are from before`
+                : this.telemetryState === 'live' ? 'Last training episode, from the server'
+                    : 'No training episode reported yet';
+        }
+    }
+
+    // Writes one telemetry value; stale values are dimmed until fresh data arrives
+    setTelemetryText(id, text) {
+        const element = document.getElementById(id);
+        if (!element) return;
+        element.textContent = text;
+        element.classList.toggle('stale', this.telemetryState === 'stale');
     }
 
     updateRobotAnimation() {
@@ -758,35 +920,6 @@ class WMGDigitalTwin {
                     child.material.emissive.setScalar(intensity * 0.1);
                 }
             });
-        }
-    }
-
-    updateCoordinates() {
-        // Calculate forward kinematics for end effector position
-        const time = Date.now() * 0.001;
-        const baseRotation = this.jointAngles[0] * Math.PI / 180;
-        
-        // Simplified forward kinematics calculation
-        const x = Math.cos(baseRotation) * (2.5 + Math.sin(time * 0.3) * 0.5);
-        const y = 2.0 + Math.sin(time * 0.2) * 0.3;
-        const z = Math.sin(baseRotation) * (2.5 + Math.sin(time * 0.3) * 0.5);
-        
-        const xEl = document.getElementById('robot-x');
-        const yEl = document.getElementById('robot-y');
-        const zEl = document.getElementById('robot-z');
-        
-        if (xEl) xEl.textContent = x.toFixed(3);
-        if (yEl) yEl.textContent = y.toFixed(3);
-        if (zEl) zEl.textContent = z.toFixed(3);
-    }
-
-    updateTrainingProgress(data) {
-        this.updateTrainingMetrics(data.episode, data.epsilon, data.reward);
-    }
-
-    updateMetrics(data) {
-        if (data) {
-            Object.assign(this.metrics, data);
         }
     }
 
