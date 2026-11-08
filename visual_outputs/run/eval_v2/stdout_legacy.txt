@@ -1,0 +1,9 @@
+[legacy] baselines done; best fixed action = Always 3: Energy saving (1827.4)
+[legacy] seed 42 reproduces the server snapshot bit for bit: False
+[legacy] seed 42: 1622.0 reward, Aggressive 100%, vs random -94.0, vs best fixed -205.4 (119.3 s)
+[legacy] seed 1: 1682.6 reward, Quality focus 100%, vs random -33.4, vs best fixed -144.8 (115.9 s)
+[legacy] seed 2: 1622.0 reward, Aggressive 100%, vs random -94.0, vs best fixed -205.4 (116.0 s)
+[legacy] seed 3: 1744.1 reward, Balanced 100%, vs random +28.1, vs best fixed -83.3 (117.0 s)
+[legacy] seed 4: 1744.1 reward, Balanced 100%, vs random +28.1, vs best fixed -83.3 (121.3 s)
+[legacy] seed 5: 1622.0 reward, Aggressive 100%, vs random -94.0, vs best fixed -205.4 (121.8 s)
+[legacy] across 6 seeds: reward 1672.8 ± 62.9 (t-CI over seeds); vs best fixed -154.6; single-action policies 6/6; beat random 2/6; wall 717.7 s
