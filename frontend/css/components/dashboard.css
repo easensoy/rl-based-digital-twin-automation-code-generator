@@ -394,6 +394,94 @@
     color: var(--wmg-secondary);
 }
 
+/* Code Generation result */
+.code-result .metric-row {
+    gap: var(--spacing-xs);
+}
+
+.code-result .metric-row label {
+    flex-shrink: 0;
+}
+
+.code-result .metric-value {
+    text-align: right;
+    overflow-wrap: anywhere;
+}
+
+.code-result .metric-value.ok {
+    color: var(--industrial-green);
+}
+
+.code-result .metric-value.warn {
+    color: var(--industrial-yellow);
+}
+
+.code-result .metric-value.failed,
+.code-error {
+    color: var(--industrial-red);
+}
+
+.code-error,
+.code-folder {
+    margin: 0;
+    font-size: 0.8rem;
+    line-height: 1.4;
+    overflow-wrap: anywhere;
+}
+
+.code-error {
+    margin-bottom: var(--spacing-sm);
+}
+
+.code-folder {
+    margin-top: var(--spacing-xs);
+    font-family: var(--font-family-mono);
+    color: var(--text-muted);
+}
+
+.code-messages summary {
+    cursor: pointer;
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+}
+
+.code-messages pre {
+    margin: var(--spacing-xs) 0 0;
+    max-height: 220px;
+    overflow: auto;
+    font-family: var(--font-family-mono);
+    font-size: 0.7rem;
+    line-height: 1.4;
+    color: var(--text-muted);
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+}
+
+/* Telemetry: "—" until the server reports, dimmed when the connection is lost */
+.telemetry-value.stale {
+    opacity: 0.45;
+}
+
+.telemetry-state {
+    font-size: 0.7rem;
+    font-weight: var(--font-weight-semibold);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--text-muted);
+}
+
+.telemetry-state.live {
+    color: var(--industrial-green);
+}
+
+.telemetry-state.stale {
+    color: var(--industrial-yellow);
+}
+
+.status-value.disconnected {
+    color: var(--industrial-red);
+}
+
 /* Performance Grid */
 .performance-grid {
     display: flex;
