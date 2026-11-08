@@ -1,0 +1,82 @@
+[
+  {
+    "seed": 1,
+    "train_seconds": 90.4,
+    "final_epsilon": 0.00998645168764533,
+    "gradient_steps": 1000,
+    "train_reward_last100_mean": 1674.2460945382406,
+    "greedy_eval_reward_mean": 1682.4633581414391,
+    "greedy_action_share": [
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      1.0,
+      0.0
+    ]
+  },
+  {
+    "seed": 2,
+    "train_seconds": 96.4,
+    "final_epsilon": 0.00998645168764533,
+    "gradient_steps": 1000,
+    "train_reward_last100_mean": 1734.096957033552,
+    "greedy_eval_reward_mean": 1621.898551091139,
+    "greedy_action_share": [
+      0.0,
+      0.0,
+      1.0,
+      0.0,
+      0.0,
+      0.0
+    ]
+  },
+  {
+    "seed": 3,
+    "train_seconds": 95.2,
+    "final_epsilon": 0.00998645168764533,
+    "gradient_steps": 1000,
+    "train_reward_last100_mean": 1699.6225017010258,
+    "greedy_eval_reward_mean": 1743.9344788330918,
+    "greedy_action_share": [
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      1.0
+    ]
+  },
+  {
+    "seed": 4,
+    "train_seconds": 75.0,
+    "final_epsilon": 0.00998645168764533,
+    "gradient_steps": 1000,
+    "train_reward_last100_mean": 1695.0018992578919,
+    "greedy_eval_reward_mean": 1743.9344788330918,
+    "greedy_action_share": [
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      1.0
+    ]
+  },
+  {
+    "seed": 5,
+    "train_seconds": 74.5,
+    "final_epsilon": 0.00998645168764533,
+    "gradient_steps": 1000,
+    "train_reward_last100_mean": 1711.5139162959001,
+    "greedy_eval_reward_mean": 1621.898551091139,
+    "greedy_action_share": [
+      0.0,
+      0.0,
+      1.0,
+      0.0,
+      0.0,
+      0.0
+    ]
+  }
+]
