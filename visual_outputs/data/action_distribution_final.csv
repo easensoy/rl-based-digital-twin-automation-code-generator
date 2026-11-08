@@ -1,0 +1,19 @@
+policy,action,share
+"Trained DQN, greedy",0 Conservative,0.0
+"Trained DQN, greedy",1 Normal,0.0
+"Trained DQN, greedy",2 Aggressive,0.0
+"Trained DQN, greedy",3 Energy saving,0.0
+"Trained DQN, greedy",4 Quality focus,1.0
+"Trained DQN, greedy",5 Balanced,0.0
+"Untrained DQN, greedy",0 Conservative,0.00035
+"Untrained DQN, greedy",1 Normal,0.0
+"Untrained DQN, greedy",2 Aggressive,0.0
+"Untrained DQN, greedy",3 Energy saving,5e-05
+"Untrained DQN, greedy",4 Quality focus,0.3665
+"Untrained DQN, greedy",5 Balanced,0.6331
+Generated ST (FB_RLOptimizer as wired),0 Conservative,0.0
+Generated ST (FB_RLOptimizer as wired),1 Normal,0.0
+Generated ST (FB_RLOptimizer as wired),2 Aggressive,1.0
+Generated ST (FB_RLOptimizer as wired),3 Energy saving,0.0
+Generated ST (FB_RLOptimizer as wired),4 Quality focus,0.0
+Generated ST (FB_RLOptimizer as wired),5 Balanced,0.0
