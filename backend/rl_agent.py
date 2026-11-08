@@ -9,6 +9,14 @@ import logging
 
 logger = logging.getLogger(__name__)
 
+# How AutomationEnvironment turns machine speed into finished parts.
+#   "legacy"             - behaviour of commit 898c112: each step adds 1/speed to the cycle
+#                          counter, so SLOWER settings finish parts faster. Kept as the default
+#                          so the published results stay reproducible.
+#   "speed_proportional" - each step adds speed to the cycle counter, so faster settings finish
+#                          parts faster (a part takes cycle_time_target / speed steps).
+PRODUCTION_MODELS = ("legacy", "speed_proportional")
+
 class DQNNetwork(nn.Module):
     def __init__(self, state_size, action_size, hidden_size=128):
         super(DQNNetwork, self).__init__()
@@ -134,7 +142,11 @@ class AutomationEnvironment:
         self.throughput_target = config.get("throughput_target", 120.0)
         self.safety_threshold = config.get("safety_threshold", 0.95)
         self.energy_efficiency_target = config.get("energy_efficiency_target", 0.85)
-        
+        self.production_model = config.get("production_model", "legacy")
+        if self.production_model not in PRODUCTION_MODELS:
+            raise ValueError(f"production_model must be one of {PRODUCTION_MODELS}, "
+                             f"got {self.production_model!r}")
+
         self.reset()
         logger.info("Automation Environment initialized")
     
@@ -216,8 +228,11 @@ class AutomationEnvironment:
         # Clip states to valid ranges
         self.state = np.clip(self.state, -2, 2)
         
-        # Update cycle metrics
-        self.cycle_time += 1.0 / speed_factor
+        # Update cycle metrics (see PRODUCTION_MODELS)
+        if self.production_model == "speed_proportional":
+            self.cycle_time += speed_factor
+        else:
+            self.cycle_time += 1.0 / speed_factor
         if self.cycle_time >= self.cycle_time_target:
             self.production_count += 1
             self.cycle_time = 0
