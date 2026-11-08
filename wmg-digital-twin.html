@@ -42,9 +42,9 @@
                             <div id="connection-status" class="status-dot"></div>
                             <span id="connection-text" class="status-text">Connecting...</span>
                         </div>
-                        <div class="performance-summary">
-                            OEE: <span id="header-oee">0.0%</span> | 
-                            Efficiency: <span id="header-efficiency">0.0%</span>
+                        <div class="performance-summary" title="Last training episode, from the server">
+                            OEE: <span id="header-oee" class="telemetry-value">&mdash;</span> |
+                            Energy: <span id="header-energy" class="telemetry-value">&mdash;</span>
                         </div>
                     </div>
                 </div>
@@ -66,11 +66,11 @@
                         <div class="status-grid">
                             <div class="status-item">
                                 <label>Connection:</label>
-                                <span id="system-connection-status" class="status-value connected">Connected</span>
+                                <span id="system-connection-status" class="status-value">Connecting...</span>
                             </div>
                             <div class="status-item">
                                 <label>Training:</label>
-                                <span id="system-training-status" class="status-value active">Active</span>
+                                <span id="system-training-status" class="status-value">&mdash;</span>
                             </div>
                         </div>
                     </div>
@@ -91,27 +91,66 @@
                         
                         <div class="training-metrics">
                             <div class="metric-row">
-                                <label>Episode:</label>
-                                <span id="current-episode" class="metric-value">525</span>
+                                <label>Episodes:</label>
+                                <span id="current-episode" class="metric-value telemetry-value"
+                                      title="Training episodes the server has run">&mdash;</span>
                             </div>
                             <div class="metric-row">
                                 <label>Epsilon:</label>
-                                <span id="epsilon-value" class="metric-value">0.072</span>
+                                <span id="epsilon-value" class="metric-value telemetry-value"
+                                      title="Exploration rate after the last episode">&mdash;</span>
                             </div>
                         </div>
                     </div>
                 </section>
 
-                <!-- Code Generation -->
+                <!-- Code Generation: the trained Q-network as an IEC 61499 Basic FB (POST /api/code/generate) -->
                 <section class="control-section">
                     <div class="section-header">
                         <h3 class="section-title">CODE</h3>
                     </div>
-                    
+
                     <div class="section-content">
                         <div class="control-buttons">
                             <button id="generate-code" class="control-btn generate-btn">Generate</button>
-                            <button id="download-code" class="control-btn download-btn" disabled>Download</button>
+                            <button id="download-fbt" class="control-btn download-btn" disabled>Download .fbt</button>
+                            <button id="download-st" class="control-btn download-btn" disabled>Download .st</button>
+                        </div>
+                        <p id="code-error" class="code-error hidden"></p>
+                        <div id="code-result" class="training-metrics code-result hidden">
+                            <div class="metric-row">
+                                <label>FB:</label>
+                                <span id="code-fb-type" class="metric-value">-</span>
+                            </div>
+                            <div class="metric-row">
+                                <label>Layers:</label>
+                                <span id="code-network" class="metric-value">-</span>
+                            </div>
+                            <div class="metric-row">
+                                <label>MACs:</label>
+                                <span id="code-macs" class="metric-value">-</span>
+                            </div>
+                            <div class="metric-row">
+                                <label>Checked:</label>
+                                <span id="code-check" class="metric-value">-</span>
+                            </div>
+                            <div class="metric-row">
+                                <label>Same action:</label>
+                                <span id="code-agreement" class="metric-value">-</span>
+                            </div>
+                            <div class="metric-row">
+                                <label>Max |&Delta;Q|:</label>
+                                <span id="code-q-diff" class="metric-value">-</span>
+                            </div>
+                            <div class="metric-row">
+                                <label>EAE compiler:</label>
+                                <span id="code-eae" class="metric-value">-</span>
+                            </div>
+                            <details id="code-eae-messages" class="code-messages hidden">
+                                <summary id="code-eae-messages-title">Compiler messages</summary>
+                                <pre id="code-eae-messages-text"></pre>
+                            </details>
+                            <p id="code-folder" class="code-folder"></p>
                         </div>
                     </div>
                 </section>
@@ -129,24 +168,6 @@
                 
                 <div class="robot-container">
                     <canvas id="robot-canvas" class="robot-canvas"></canvas>
-                    
-                    <!-- Minimal Robot Position Display -->
-                    <div class="robot-overlay">
-                        <div class="coordinate-display">
-                            <div class="coord-item">
-                                <label>X:</label>
-                                <span id="robot-x">1.869</span>
-                            </div>
-                            <div class="coord-item">
-                                <label>Y:</label>
-                                <span id="robot-y">0.707</span>
-                            </div>
-                            <div class="coord-item">
-                                <label>Z:</label>
-                                <span id="robot-z">-0.711</span>
-                            </div>
-                        </div>
-                    </div>
                 </div>
             </section>
 
@@ -157,33 +178,36 @@
                 <section class="metrics-section">
                     <div class="section-header">
                         <h3 class="section-title">METRICS</h3>
+                        <span id="telemetry-state" class="telemetry-state"
+                              title="No training episode reported yet">no data</span>
                     </div>
-                    
+
+                    <!-- Values of the last training episode (AutomationEnvironment.get_performance_metrics) -->
                     <div class="section-content">
                         <div class="performance-grid">
-                            <div class="perf-item">
-                                <label>Cycle:</label>
-                                <span id="cycle-time" class="perf-value">28.5s</span>
+                            <div class="perf-item" title="Cycle counter at the end of the episode: progress of the part in work, in simulation steps (a part is done at cycle_time_target). Not a time.">
+                                <label>Cycle counter:</label>
+                                <span id="cycle-time" class="perf-value telemetry-value">&mdash;</span>
                             </div>
-                            <div class="perf-item">
+                            <div class="perf-item" title="Parts finished per 100 simulation steps">
                                 <label>Throughput:</label>
-                                <span id="throughput" class="perf-value">125/min</span>
+                                <span id="throughput" class="perf-value telemetry-value">&mdash;</span>
                             </div>
-                            <div class="perf-item">
+                            <div class="perf-item" title="1 - safety violations / 10, as a percentage">
                                 <label>Safety:</label>
-                                <span id="safety-score" class="perf-value">100%</span>
+                                <span id="safety-score" class="perf-value telemetry-value">&mdash;</span>
                             </div>
-                            <div class="perf-item">
+                            <div class="perf-item" title="1 / (1 + mean energy per step), as a percentage">
                                 <label>Energy:</label>
-                                <span id="energy-efficiency" class="perf-value">85%</span>
+                                <span id="energy-efficiency" class="perf-value telemetry-value">&mdash;</span>
                             </div>
-                            <div class="perf-item">
+                            <div class="perf-item" title="Availability x performance x quality of the episode, as a percentage">
                                 <label>OEE:</label>
-                                <span id="oee-value" class="perf-value">91.8%</span>
+                                <span id="oee-value" class="perf-value telemetry-value">&mdash;</span>
                             </div>
-                            <div class="perf-item">
+                            <div class="perf-item" title="Total reward of the episode">
                                 <label>Reward:</label>
-                                <span id="current-reward" class="perf-value">1628.22</span>
+                                <span id="current-reward" class="perf-value telemetry-value">&mdash;</span>
                             </div>
                         </div>
                     </div>
@@ -249,43 +273,7 @@
                 </div>
                 
                 <div class="log-container">
-                    <div id="log-content" class="log-content">
-                        <div class="log-entry info">
-                            <span class="log-timestamp">[1:31:45 PM]</span>
-                            <span class="log-level">INFO</span>
-                            <span class="log-message">Episode 519: Reward=1682.07</span>
-                        </div>
-                        <div class="log-entry info">
-                            <span class="log-timestamp">[1:31:45 PM]</span>
-                            <span class="log-level">INFO</span>
-                            <span class="log-message">Episode 520: Reward=1684.45</span>
-                        </div>
-                        <div class="log-entry info">
-                            <span class="log-timestamp">[1:31:45 PM]</span>
-                            <span class="log-level">INFO</span>
-                            <span class="log-message">Episode 521: Reward=1686.84</span>
-                        </div>
-                        <div class="log-entry info">
-                            <span class="log-timestamp">[1:31:46 PM]</span>
-                            <span class="log-level">INFO</span>
-                            <span class="log-message">Episode 522: Reward=1677.02</span>
-                        </div>
-                        <div class="log-entry info">
-                            <span class="log-timestamp">[1:31:46 PM]</span>
-                            <span class="log-level">INFO</span>
-                            <span class="log-message">Episode 523: Reward=1628.39</span>
-                        </div>
-                        <div class="log-entry warning">
-                            <span class="log-timestamp">[1:31:46 PM]</span>
-                            <span class="log-level">WARN</span>
-                            <span class="log-message">Episode 524: Reward=1626.10</span>
-                        </div>
-                        <div class="log-entry info">
-                            <span class="log-timestamp">[1:31:46 PM]</span>
-                            <span class="log-level">INFO</span>
-                            <span class="log-message">Episode 525: Reward=1628.22</span>
-                        </div>
-                    </div>
+                    <div id="log-content" class="log-content"></div>
                 </div>
             </footer>
             
@@ -294,8 +282,7 @@
 
     <script src="frontend/js/core/event-dispatcher.js"></script>
     <script src="frontend/js/core/websocket-manager.js"></script>
-    <script src="frontend/js/robotics/inverse-kinematics.js"></script>
-    <script src="frontend/js/robotics/robot-visualizer.js"></script>
+    <!-- inverse-kinematics.js and robot-visualizer.js are ES modules main.js does not use -->
     <script src="frontend/js/robotics/robot-controller.js"></script>
     <script src="frontend/main.js"></script>
 </body>
