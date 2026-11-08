@@ -1,0 +1,415 @@
+{
+  "production_model": "legacy",
+  "training_seeds": [
+    42,
+    1,
+    2,
+    3,
+    4,
+    5
+  ],
+  "eval_episodes_per_policy": 100,
+  "env_seeds": [
+    10000,
+    10099
+  ],
+  "train_episodes": 1000,
+  "baselines": {
+    "Uniform random": {
+      "total_reward": {
+        "mean": 1715.9948147363652,
+        "ci95": 1.1940478104440897
+      },
+      "energy_efficiency": {
+        "mean": 0.5300196508258762,
+        "ci95": 0.0012744783857135014
+      },
+      "quality_mean": {
+        "mean": 0.9512252101213619,
+        "ci95": 0.0003148294861265802
+      },
+      "throughput": {
+        "mean": 3.5,
+        "ci95": 0.0
+      },
+      "production_count": {
+        "mean": 7.0,
+        "ci95": 0.0
+      },
+      "oee": {
+        "mean": 0.02777386404694791,
+        "ci95": 0.00010751706369801375
+      }
+    },
+    "Always 0: Conservative": {
+      "total_reward": {
+        "mean": 1772.3726651633378,
+        "ci95": 0.13732192890791003
+      },
+      "energy_efficiency": {
+        "mean": 0.6203473945409436,
+        "ci95": 0.0
+      },
+      "quality_mean": {
+        "mean": 0.9465447976213619,
+        "ci95": 0.00013732192890789554
+      },
+      "throughput": {
+        "mean": 4.0,
+        "ci95": 0.0
+      },
+      "production_count": {
+        "mean": 8.0,
+        "ci95": 0.0
+      },
+      "oee": {
+        "mean": 0.031556308910797595,
+        "ci95": 6.0855195544352696e-05
+      }
+    },
+    "Always 1: Normal": {
+      "total_reward": {
+        "mean": 1715.5400277139986,
+        "ci95": 0.13732192890790273
+      },
+      "energy_efficiency": {
+        "mean": 0.5,
+        "ci95": 0.0
+      },
+      "quality_mean": {
+        "mean": 0.9750447976213619,
+        "ci95": 0.00013732192890789357
+      },
+      "throughput": {
+        "mean": 3.0,
+        "ci95": 0.0
+      },
+      "production_count": {
+        "mean": 6.0,
+        "ci95": 0.0
+      },
+      "oee": {
+        "mean": 0.0243797316830982,
+        "ci95": 4.5641396658264535e-05
+      }
+    },
+    "Always 2: Aggressive": {
+      "total_reward": {
+        "mean": 1622.0175036146957,
+        "ci95": 0.13732192890790515
+      },
+      "energy_efficiency": {
+        "mean": 0.407830342577488,
+        "ci95": 2.1869996013146937e-17
+      },
+      "quality_mean": {
+        "mean": 0.9465447976213619,
+        "ci95": 0.00013732192890789554
+      },
+      "throughput": {
+        "mean": 2.5,
+        "ci95": 0.0
+      },
+      "production_count": {
+        "mean": 5.0,
+        "ci95": 0.0
+      },
+      "oee": {
+        "mean": 0.019722693069248502,
+        "ci95": 3.803449721522045e-05
+      }
+    },
+    "Always 3: Energy saving": {
+      "total_reward": {
+        "mean": 1827.377951324987,
+        "ci95": 0.1373219289078894
+      },
+      "energy_efficiency": {
+        "mean": 0.7225433526011558,
+        "ci95": 2.1869996013146937e-17
+      },
+      "quality_mean": {
+        "mean": 0.9180447976213618,
+        "ci95": 0.00013732192890789422
+      },
+      "throughput": {
+        "mean": 5.5,
+        "ci95": 0.0
+      },
+      "production_count": {
+        "mean": 11.0,
+        "ci95": 0.0
+      },
+      "oee": {
+        "mean": 0.042083674752346714,
+        "ci95": 8.367589387348494e-05
+      }
+    },
+    "Always 4: Quality focus": {
+      "total_reward": {
+        "mean": 1682.5823106649957,
+        "ci95": 0.13732192890791486
+      },
+      "energy_efficiency": {
+        "mean": 0.47681487662415006,
+        "ci95": 3.280499401972041e-17
+      },
+      "quality_mean": {
+        "mean": 0.9607947976213618,
+        "ci95": 0.00013732192890789037
+      },
+      "throughput": {
+        "mean": 3.0,
+        "ci95": 0.0
+      },
+      "production_count": {
+        "mean": 6.0,
+        "ci95": 0.0
+      },
+      "oee": {
+        "mean": 0.024023481683098206,
+        "ci95": 4.564139665826451e-05
+      }
+    },
+    "Always 5: Balanced": {
+      "total_reward": {
+        "mean": 1744.0534313566488,
+        "ci95": 0.1373219289078949
+      },
+      "energy_efficiency": {
+        "mean": 0.565131393048885,
+        "ci95": 2.1869996013146937e-17
+      },
+      "quality_mean": {
+        "mean": 0.9607947976213618,
+        "ci95": 0.00013732192890789037
+      },
+      "throughput": {
+        "mean": 3.5,
+        "ci95": 0.0
+      },
+      "production_count": {
+        "mean": 7.0,
+        "ci95": 0.0
+      },
+      "oee": {
+        "mean": 0.02802739529694791,
+        "ci95": 5.324829610130862e-05
+      }
+    }
+  },
+  "best_fixed_action": "Always 3: Energy saving",
+  "per_seed": [
+    {
+      "train_seed": 42,
+      "train_seconds": 119.3,
+      "final_epsilon": 0.00998645168764533,
+      "gradient_steps": 1000,
+      "train_reward_last100_mean": 1682.5587030505171,
+      "eval_reward_mean": 1622.0175036146957,
+      "eval_reward_ci95_episodes": 0.13732192890790515,
+      "paired_diff_vs_random": -93.97731112166888,
+      "paired_diff_vs_random_ci95": 1.1701623641415888,
+      "paired_diff_vs_best_fixed": -205.3604477102912,
+      "paired_diff_vs_best_fixed_ci95": 1.9385801955385755e-13,
+      "action_share": [
+        0.0,
+        0.0,
+        1.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "dominant_action": "Aggressive",
+      "dominant_share": 1.0,
+      "eval_energy_efficiency_mean": 0.407830342577488,
+      "eval_quality_mean_mean": 0.9465447976213619,
+      "eval_throughput_mean": 2.5,
+      "eval_production_count_mean": 5.0,
+      "eval_oee_mean": 0.019722693069248502
+    },
+    {
+      "train_seed": 1,
+      "train_seconds": 115.9,
+      "final_epsilon": 0.00998645168764533,
+      "gradient_steps": 1000,
+      "train_reward_last100_mean": 1674.2460945382406,
+      "eval_reward_mean": 1682.5823106649957,
+      "eval_reward_ci95_episodes": 0.13732192890791486,
+      "paired_diff_vs_random": -33.41250407136913,
+      "paired_diff_vs_random_ci95": 1.1701623641415586,
+      "paired_diff_vs_best_fixed": -144.79564065999142,
+      "paired_diff_vs_best_fixed_ci95": 1.930511047091239e-13,
+      "action_share": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        1.0,
+        0.0
+      ],
+      "dominant_action": "Quality focus",
+      "dominant_share": 1.0,
+      "eval_energy_efficiency_mean": 0.47681487662415006,
+      "eval_quality_mean_mean": 0.9607947976213618,
+      "eval_throughput_mean": 3.0,
+      "eval_production_count_mean": 6.0,
+      "eval_oee_mean": 0.024023481683098206
+    },
+    {
+      "train_seed": 2,
+      "train_seconds": 116.0,
+      "final_epsilon": 0.00998645168764533,
+      "gradient_steps": 1000,
+      "train_reward_last100_mean": 1734.096957033552,
+      "eval_reward_mean": 1622.0175036146957,
+      "eval_reward_ci95_episodes": 0.13732192890790515,
+      "paired_diff_vs_random": -93.97731112166888,
+      "paired_diff_vs_random_ci95": 1.1701623641415888,
+      "paired_diff_vs_best_fixed": -205.3604477102912,
+      "paired_diff_vs_best_fixed_ci95": 1.9385801955385755e-13,
+      "action_share": [
+        0.0,
+        0.0,
+        1.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "dominant_action": "Aggressive",
+      "dominant_share": 1.0,
+      "eval_energy_efficiency_mean": 0.407830342577488,
+      "eval_quality_mean_mean": 0.9465447976213619,
+      "eval_throughput_mean": 2.5,
+      "eval_production_count_mean": 5.0,
+      "eval_oee_mean": 0.019722693069248502
+    },
+    {
+      "train_seed": 3,
+      "train_seconds": 117.0,
+      "final_epsilon": 0.00998645168764533,
+      "gradient_steps": 1000,
+      "train_reward_last100_mean": 1699.6225017010258,
+      "eval_reward_mean": 1744.0534313566488,
+      "eval_reward_ci95_episodes": 0.1373219289078949,
+      "paired_diff_vs_random": 28.05861662028387,
+      "paired_diff_vs_random_ci95": 1.1701623641415793,
+      "paired_diff_vs_best_fixed": -83.32451996833842,
+      "paired_diff_vs_best_fixed_ci95": 1.9331396470263922e-13,
+      "action_share": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "dominant_action": "Balanced",
+      "dominant_share": 1.0,
+      "eval_energy_efficiency_mean": 0.565131393048885,
+      "eval_quality_mean_mean": 0.9607947976213618,
+      "eval_throughput_mean": 3.5,
+      "eval_production_count_mean": 7.0,
+      "eval_oee_mean": 0.02802739529694791
+    },
+    {
+      "train_seed": 4,
+      "train_seconds": 121.3,
+      "final_epsilon": 0.00998645168764533,
+      "gradient_steps": 1000,
+      "train_reward_last100_mean": 1695.0018992578919,
+      "eval_reward_mean": 1744.0534313566488,
+      "eval_reward_ci95_episodes": 0.1373219289078949,
+      "paired_diff_vs_random": 28.05861662028387,
+      "paired_diff_vs_random_ci95": 1.1701623641415793,
+      "paired_diff_vs_best_fixed": -83.32451996833842,
+      "paired_diff_vs_best_fixed_ci95": 1.9331396470263922e-13,
+      "action_share": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "dominant_action": "Balanced",
+      "dominant_share": 1.0,
+      "eval_energy_efficiency_mean": 0.565131393048885,
+      "eval_quality_mean_mean": 0.9607947976213618,
+      "eval_throughput_mean": 3.5,
+      "eval_production_count_mean": 7.0,
+      "eval_oee_mean": 0.02802739529694791
+    },
+    {
+      "train_seed": 5,
+      "train_seconds": 121.8,
+      "final_epsilon": 0.00998645168764533,
+      "gradient_steps": 1000,
+      "train_reward_last100_mean": 1711.5139162959001,
+      "eval_reward_mean": 1622.0175036146957,
+      "eval_reward_ci95_episodes": 0.13732192890790515,
+      "paired_diff_vs_random": -93.97731112166888,
+      "paired_diff_vs_random_ci95": 1.1701623641415888,
+      "paired_diff_vs_best_fixed": -205.3604477102912,
+      "paired_diff_vs_best_fixed_ci95": 1.9385801955385755e-13,
+      "action_share": [
+        0.0,
+        0.0,
+        1.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "dominant_action": "Aggressive",
+      "dominant_share": 1.0,
+      "eval_energy_efficiency_mean": 0.407830342577488,
+      "eval_quality_mean_mean": 0.9465447976213619,
+      "eval_throughput_mean": 2.5,
+      "eval_production_count_mean": 5.0,
+      "eval_oee_mean": 0.019722693069248502
+    }
+  ],
+  "across_seeds": {
+    "eval_reward": {
+      "mean": 1672.79028070373,
+      "sd_across_seeds": 59.977298726637976,
+      "ci95_across_seeds": 62.94231489237929,
+      "min": 1622.0175036146957,
+      "max": 1744.0534313566488
+    },
+    "paired_diff_vs_random": {
+      "mean": -43.20453403263466,
+      "sd_across_seeds": 59.97729872663777,
+      "ci95_across_seeds": 62.94231489237907,
+      "min": -93.97731112166888,
+      "max": 28.05861662028387
+    },
+    "paired_diff_vs_best_fixed": {
+      "mean": -154.587670621257,
+      "sd_across_seeds": 59.977298726637784,
+      "ci95_across_seeds": 62.94231489237909,
+      "min": -205.3604477102912,
+      "max": -83.32451996833842
+    },
+    "seeds_with_single_action_policy": 6,
+    "seeds_choosing_best_fixed_action": 0,
+    "seeds_beating_random": 2,
+    "note": "ci95_across_seeds uses Student t over training seeds (training reliability); per-seed ci95 fields cover episode noise only."
+  },
+  "reproducibility": {
+    "compared_with": "policy_snapshot_20261106_190932.pt",
+    "bit_identical": false,
+    "max_abs_diff": 0.5686860680580139,
+    "per_tensor_max_abs_diff": {
+      "fc1.weight": 0.09448769688606262,
+      "fc1.bias": 0.08163215965032578,
+      "fc2.weight": 0.5686860680580139,
+      "fc2.bias": 0.3356064558029175,
+      "fc3.weight": 0.13589656352996826,
+      "fc3.bias": 0.09472174197435379,
+      "fc4.weight": 0.07769834995269775,
+      "fc4.bias": 0.1111372858285904
+    }
+  },
+  "wall_seconds": 717.7
+}
