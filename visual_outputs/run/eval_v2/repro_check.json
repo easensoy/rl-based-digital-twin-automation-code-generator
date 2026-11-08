@@ -1,0 +1,15 @@
+{
+  "compared_with": "policy_snapshot_20261106_190932.pt",
+  "bit_identical": false,
+  "max_abs_diff": 0.5686860680580139,
+  "per_tensor_max_abs_diff": {
+    "fc1.weight": 0.09448769688606262,
+    "fc1.bias": 0.08163215965032578,
+    "fc2.weight": 0.5686860680580139,
+    "fc2.bias": 0.3356064558029175,
+    "fc3.weight": 0.13589656352996826,
+    "fc3.bias": 0.09472174197435379,
+    "fc4.weight": 0.07769834995269775,
+    "fc4.bias": 0.1111372858285904
+  }
+}
