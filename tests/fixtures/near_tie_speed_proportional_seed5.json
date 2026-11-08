@@ -1,0 +1,343 @@
+{
+ "what": "The two states on which the strict export gate rejected speed_proportional_seed5 on 2026-11-08. PyTorch's best two actions (Quality focus, Aggressive) differ by 1.22e-4, a few float32 ulps. The generated function block sums in another order, its two Q-values round to an exact tie, and its argmax keeps the first maximum: Aggressive, with Aggressive's setpoints. Every Q-value stays within the 1e-3 tolerance, so a Q-only check would accept this export; the strict gate rejects it.",
+ "generated_by": "docs/scripts/extract_near_tie_fixture.py (deterministic: no timestamp, so the file hash is stable)",
+ "measurement": "docs/data/export_verification.json, generated 2026-11-08T03:49:53",
+ "values": "float32 values written as exact decimals; *_bits are the IEEE 754 binary32 patterns",
+ "checkpoint": {
+  "path": "visual_outputs/run/eval_v2/policies/speed_proportional_seed5.pt",
+  "sha256": "738ba0ca86d0d215a6adf41ca3e009c9924701449db5f025fd1a97180fff0b56",
+  "weights_sha256": "5048b0688f3f97bc82afbbdcf4b4f7f41beaf3c167f738e29e2ae0a63848c02f",
+  "origin": "multi-seed evaluation of 2026-11-07: training seed 5, corrected (speed_proportional) production model, 1,000 training episodes"
+ },
+ "export": {
+  "date": "2026-11-08",
+  "fbt_sha256": "1cdad527eff7ae590fcf679dd7b297012a7338910471f8f0568140011df174ce",
+  "st_sha256": "8d8833a71d55f5b0c2d8131db316ae418dbbb0f9e5cf9833d6391cb5e33c2f64"
+ },
+ "state_set": {
+  "construction": "measure_export_verification.states(): 10,000 rollout states of the default simulator under uniform random actions, then 10,000 draws uniform in [-2, 2]^12, both seeded 20261108, as float32",
+  "seed": 20261108,
+  "n_rollout": 10000,
+  "n_box": 10000,
+  "n": 20000,
+  "float32_sha256": "2b7cfc12f2f6e8309b2d8d15f233d32e36b178a9f72097952fae2fd6a3e21066",
+  "rejected_indices": [
+   13327,
+   14848
+  ]
+ },
+ "state_names": [
+  "POS_X",
+  "POS_Y",
+  "POS_Z",
+  "VEL_X",
+  "VEL_Y",
+  "VEL_Z",
+  "TEMP",
+  "PRESSURE",
+  "VIBRATION",
+  "LOAD",
+  "QUALITY",
+  "ENERGY"
+ ],
+ "action_names": [
+  "Conservative",
+  "Normal",
+  "Aggressive",
+  "Energy saving",
+  "Quality focus",
+  "Balanced"
+ ],
+ "setpoint_outputs": [
+  "SPEED_SP",
+  "PRESSURE_SP",
+  "TEMP_SP"
+ ],
+ "reference": "rl_agent.DQNNetwork in eval mode, float32 CPU, evaluated on the full 20,000-state batch as the gate does; reference_by_batch_size shows how PyTorch's own values move with batch size",
+ "environment": {
+  "torch": "2.1.0+cpu",
+  "numpy": "1.24.3",
+  "torch_threads": 16
+ },
+ "st_on_these_states": {
+  "q_bit_identical_to_fbt": true,
+  "action_identical_to_fbt": true
+ },
+ "states": [
+  {
+   "index": 13327,
+   "sampled_from": "uniform box, draw 3327 of 10000",
+   "input": [
+    -0.7379468083381653,
+    -0.241924449801445,
+    -1.61155104637146,
+    1.3995705842971802,
+    0.7049694061279297,
+    -1.932121992111206,
+    1.0958495140075684,
+    -1.2334295511245728,
+    -1.4186904430389404,
+    -1.655822515487671,
+    -1.5739277601242065,
+    -1.047497034072876
+   ],
+   "reference_q": [
+    437.5198974609375,
+    442.90509033203125,
+    456.4538269042969,
+    427.6992492675781,
+    456.4539489746094,
+    435.57000732421875
+   ],
+   "reference_q_bits": [
+    "0x43dac28c",
+    "0x43dd73da",
+    "0x43e43a17",
+    "0x43d5d981",
+    "0x43e43a1b",
+    "0x43d9c8f6"
+   ],
+   "generated_q": [
+    437.5199890136719,
+    442.9051513671875,
+    456.45391845703125,
+    427.6991882324219,
+    456.45391845703125,
+    435.57012939453125
+   ],
+   "generated_q_bits": [
+    "0x43dac28f",
+    "0x43dd73dc",
+    "0x43e43a1a",
+    "0x43d5d97f",
+    "0x43e43a1a",
+    "0x43d9c8fa"
+   ],
+   "reference_action": 4,
+   "generated_action": 2,
+   "competing_actions": [
+    4,
+    2
+   ],
+   "reference_top2_gap": 0.0001220703125,
+   "float32_ulp_at_reference_max": 3.0517578125e-05,
+   "generated_gap_same_pair": 0.0,
+   "max_abs_q_diff": 0.0001220703125,
+   "reference_setpoints": [
+    1.100000023841858,
+    1.0499999523162842,
+    0.949999988079071
+   ],
+   "generated_setpoints": [
+    1.2000000476837158,
+    1.100000023841858,
+    1.100000023841858
+   ],
+   "reference_by_batch_size": [
+    {
+     "batch": "20000 (as the gate runs it)",
+     "q_competing": [
+      456.4539489746094,
+      456.4538269042969
+     ],
+     "gap": 0.0001220703125,
+     "argmax": "Quality focus",
+     "max_abs_diff_vs_gate_reference": 0.0
+    },
+    {
+     "batch": "2 (these two states)",
+     "q_competing": [
+      456.4539794921875,
+      456.4538269042969
+     ],
+     "gap": 0.000152587890625,
+     "argmax": "Quality focus",
+     "max_abs_diff_vs_gate_reference": 6.103515625e-05
+    },
+    {
+     "batch": "1 (each state alone)",
+     "q_competing": [
+      456.45391845703125,
+      456.4538269042969
+     ],
+     "gap": 9.1552734375e-05,
+     "argmax": "Quality focus",
+     "max_abs_diff_vs_gate_reference": 6.103515625e-05
+    }
+   ]
+  },
+  {
+   "index": 14848,
+   "sampled_from": "uniform box, draw 4848 of 10000",
+   "input": [
+    0.9115474820137024,
+    -0.4681237041950226,
+    -1.6697819232940674,
+    -1.2104408740997314,
+    0.07155651599168777,
+    1.8858858346939087,
+    -0.6040109992027283,
+    -1.7792552709579468,
+    -1.609841227531433,
+    -1.0164768695831299,
+    0.5219349265098572,
+    -1.921786904335022
+   ],
+   "reference_q": [
+    675.1864013671875,
+    683.73388671875,
+    704.5488891601562,
+    660.3087768554688,
+    704.5490112304688,
+    672.3837890625
+   ],
+   "reference_q_bits": [
+    "0x4428cbee",
+    "0x442aeef8",
+    "0x44302321",
+    "0x442513c3",
+    "0x44302323",
+    "0x44281890"
+   ],
+   "generated_q": [
+    675.1864624023438,
+    683.7340698242188,
+    704.5488891601562,
+    660.3087158203125,
+    704.5488891601562,
+    672.3837280273438
+   ],
+   "generated_q_bits": [
+    "0x4428cbef",
+    "0x442aeefb",
+    "0x44302321",
+    "0x442513c2",
+    "0x44302321",
+    "0x4428188f"
+   ],
+   "reference_action": 4,
+   "generated_action": 2,
+   "competing_actions": [
+    4,
+    2
+   ],
+   "reference_top2_gap": 0.0001220703125,
+   "float32_ulp_at_reference_max": 6.103515625e-05,
+   "generated_gap_same_pair": 0.0,
+   "max_abs_q_diff": 0.00018310546875,
+   "reference_setpoints": [
+    1.100000023841858,
+    1.0499999523162842,
+    0.949999988079071
+   ],
+   "generated_setpoints": [
+    1.2000000476837158,
+    1.100000023841858,
+    1.100000023841858
+   ],
+   "reference_by_batch_size": [
+    {
+     "batch": "20000 (as the gate runs it)",
+     "q_competing": [
+      704.5490112304688,
+      704.5488891601562
+     ],
+     "gap": 0.0001220703125,
+     "argmax": "Quality focus",
+     "max_abs_diff_vs_gate_reference": 0.0
+    },
+    {
+     "batch": "2 (these two states)",
+     "q_competing": [
+      704.5490112304688,
+      704.5489501953125
+     ],
+     "gap": 6.103515625e-05,
+     "argmax": "Quality focus",
+     "max_abs_diff_vs_gate_reference": 0.0001220703125
+    },
+    {
+     "batch": "1 (each state alone)",
+     "q_competing": [
+      704.5490112304688,
+      704.5488891601562
+     ],
+     "gap": 0.0001220703125,
+     "argmax": "Quality focus",
+     "max_abs_diff_vs_gate_reference": 0.0001220703125
+    }
+   ]
+  }
+ ],
+ "q_only_check": {
+  "q_tolerance": 0.001,
+  "max_abs_q_diff_over_20000": 0.000732421875,
+  "would_accept": true
+ },
+ "strict_gate": {
+  "tie_tolerance": 0.0,
+  "on_20000_states": {
+   "ok": false,
+   "checks": {
+    "q_values": true,
+    "argmax": false,
+    "setpoints": false
+   },
+   "max_abs_q_diff": 0.000732421875,
+   "argmax_agreement": 0.9999,
+   "argmax_disagreements": 2,
+   "near_tie_disagreements": 0,
+   "setpoint_mismatches": 2,
+   "tie_tolerance": 0.0,
+   "states": 20000
+  },
+  "on_these_two_states": {
+   "ok": false,
+   "checks": {
+    "q_values": true,
+    "argmax": false,
+    "setpoints": false
+   },
+   "max_abs_q_diff": 0.00018310546875,
+   "argmax_agreement": 0.0,
+   "argmax_disagreements": 2,
+   "near_tie_disagreements": 0,
+   "setpoint_mismatches": 2,
+   "tie_tolerance": 0.0,
+   "states": 2
+  }
+ },
+ "diagnostic_only_tie_tolerance_recheck": {
+  "note": "Counts the two disagreements as near-ties. The generated action and setpoints still differ from PyTorch's on both states, so this is not behavioural equivalence and not a strict pass.",
+  "on_20000_states": {
+   "ok": true,
+   "checks": {
+    "q_values": true,
+    "argmax": true,
+    "setpoints": true
+   },
+   "max_abs_q_diff": 0.000732421875,
+   "argmax_agreement": 0.9999,
+   "argmax_disagreements": 2,
+   "near_tie_disagreements": 2,
+   "setpoint_mismatches": 0,
+   "tie_tolerance": 0.002,
+   "states": 20000
+  },
+  "on_these_two_states": {
+   "ok": true,
+   "checks": {
+    "q_values": true,
+    "argmax": true,
+    "setpoints": true
+   },
+   "max_abs_q_diff": 0.00018310546875,
+   "argmax_agreement": 0.0,
+   "argmax_disagreements": 2,
+   "near_tie_disagreements": 2,
+   "setpoint_mismatches": 0,
+   "tie_tolerance": 0.002,
+   "states": 2
+  }
+ }
+}
