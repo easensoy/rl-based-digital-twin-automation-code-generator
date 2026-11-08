@@ -1,0 +1,38 @@
+URL: http://127.0.0.1:8001/
+wait: 6.0s, viewport 1600x1000
+
+[other.warning] Tracking Prevention blocked access to storage for https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js. http://127.0.0.1:8001/
+[other.warning] Tracking Prevention blocked access to storage for https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js. http://127.0.0.1:8001/
+[other.warning] Tracking Prevention blocked access to storage for https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js. http://127.0.0.1:8001/
+[other.warning] Tracking Prevention blocked access to storage for https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js. http://127.0.0.1:8001/
+[console.log] WMG Event Dispatcher initialized
+[console.log] Event processing started
+[console.log] WMG Event Dispatcher system loaded and ready
+[uncaught] SyntaxError: Unexpected token 'export'  @ http://127.0.0.1:8001/frontend/js/core/websocket-manager.js:10
+[uncaught] SyntaxError: Unexpected token 'export'  @ http://127.0.0.1:8001/frontend/js/robotics/inverse-kinematics.js:10
+[uncaught] SyntaxError: Unexpected token 'export'  @ http://127.0.0.1:8001/frontend/js/robotics/robot-visualizer.js:10
+[console.log] WMG Robot Controller module loaded
+[console.log] WMG Digital Twin Platform Enhanced Main Module loaded
+[console.log] Starting Enhanced WMG Digital Twin Platform...
+[console.log] WMG Digital Twin Platform starting...
+[console.log] Initializing WMG Digital Twin Platform...
+[console.warning] WebSocket connection failed: Error: WebSocketManager not available
+    at WMGDigitalTwin.initializeWebSocket (http://127.0.0.1:8001/frontend/main.js:92:23)
+    at WMGDigitalTwin.initialize (http://127.0.0.1:8001/frontend/main.js:41:24)
+    at HTMLDocument.<anonymous> (http://127.0.0.1:8001/frontend/main.js:839:15)
+[console.log] Starting 3D initialization...
+[console.log] Canvas found, Three.js loaded
+[console.log] Camera positioned at: Lt
+[console.log] Renderer created with size: 800 x 600
+[console.log] Lighting and grid added
+[console.error] 3D initialization failed: TypeError: this.createSimpleRobot is not a function
+    at WMGDigitalTwin.initialize3D (http://127.0.0.1:8001/frontend/main.js:160:18)
+    at WMGDigitalTwin.initialize (http://127.0.0.1:8001/frontend/main.js:44:18)
+    at async HTMLDocument.<anonymous> (http://127.0.0.1:8001/frontend/main.js:839:5)
+[console.error] Initialization failed: TypeError: this.createFallbackCanvas is not a function
+    at WMGDigitalTwin.initialize3D (http://127.0.0.1:8001/frontend/main.js:176:18)
+    at WMGDigitalTwin.initialize (http://127.0.0.1:8001/frontend/main.js:44:18)
+    at async HTMLDocument.<anonymous> (http://127.0.0.1:8001/frontend/main.js:839:5)
+[console.log] Starting enhanced simulation mode...
+[network.error] Failed to load resource: the server responded with a status of 404 (Not Found) http://127.0.0.1:8001/favicon.ico
+[diagnostic eval] {"result": {"type": "object", "value": {"robotParts": 10, "joints": 6}}}
