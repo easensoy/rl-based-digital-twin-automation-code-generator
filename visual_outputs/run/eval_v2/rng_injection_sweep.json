@@ -1,0 +1,16 @@
+{
+  "description": "one random.getrandbits(32) injected before replay call k, 150-episode training, seed 42, legacy",
+  "max_abs_weight_diff_by_k": {
+    "101": 0.0,
+    "102": 0.021318290382623672,
+    "103": 0.0,
+    "104": 0.0,
+    "105": 0.0,
+    "106": 0.0,
+    "107": 0.03244178742170334,
+    "108": 0.02334868535399437,
+    "109": 0.0,
+    "110": 0.0
+  },
+  "runs_changed": 3
+}
