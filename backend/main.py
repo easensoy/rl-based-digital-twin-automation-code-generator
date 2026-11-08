@@ -8,9 +8,11 @@ the digital twin visualization frontend.
 """
 
 import asyncio
+import itertools
 import json
 import logging
 import os
+import shutil
 import sys
 from datetime import datetime
 from pathlib import Path
@@ -24,10 +26,12 @@ from fastapi.responses import HTMLResponse, FileResponse
 
 # Import custom modules
 from rl_agent import DQNAgent, AutomationEnvironment
-from plc_generator import PLCCodeGenerator
 from websocket_handler import WebSocketConnectionManager
+import eae_fbtype_compiler
+import iec61499_exporter
 
-# Configure logging
+# Configure logging. The log folder is created first: a fresh clone has no data/ folder.
+os.makedirs("data/training_logs", exist_ok=True)
 logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
@@ -38,6 +42,19 @@ logging.basicConfig(
 )
 
 logger = logging.getLogger(__name__)
+
+# PLC code generation: the trained Q-network exported as an IEC 61499 Basic FB by
+# iec61499_exporter.py. Any key can be overridden under "code_generation" in config.json.
+CODE_GENERATION_DEFAULTS = {
+    "output_dir": "data/generated_code/iec61499",  # one timestamped folder per generation
+    "fb_name": "DQN_POLICY",
+    "namespace": "Main",
+    "state_input": "scalar",                        # or "array": one STATE : ARRAY[0..11] OF REAL
+    "verify_states": 2000,                          # replay-buffer states replayed through the FB (0: skip)
+    "tie_tolerance": 0.0,                           # > 0: excuse (and count) argmax differences on near-ties
+    "eae_check": True,                              # compile with EAE's FBTypeCompiler.exe when installed
+}
+
 
 class WMGDigitalTwinServer:
     """
@@ -57,7 +74,8 @@ class WMGDigitalTwinServer:
         self.connection_manager = WebSocketConnectionManager()
         self.rl_agent = None
         self.automation_environment = None
-        self.plc_generator = PLCCodeGenerator()
+        self.code_lock = asyncio.Lock()   # one PLC code generation at a time
+        self.last_code_export = None      # details of the last generated FB
         
         # Training state
         self.training_active = False
@@ -82,7 +100,7 @@ class WMGDigitalTwinServer:
         
         default_config = {
             "server": {
-                "host": "0.0.0.0",
+                "host": "127.0.0.1",   # this machine only; set a LAN address deliberately
                 "port": 8000,
                 "reload": False
             },
@@ -100,7 +118,8 @@ class WMGDigitalTwinServer:
                 "throughput_target": 120.0,
                 "safety_threshold": 0.95,
                 "energy_efficiency_target": 0.85
-            }
+            },
+            "code_generation": dict(CODE_GENERATION_DEFAULTS)
         }
         
         if config_path.exists():
@@ -114,23 +133,39 @@ class WMGDigitalTwinServer:
         
         return default_config
 
+    def own_origins(self, port: int) -> List[str]:
+        """Origins of the dashboard this server serves on ``port``: a loopback name or
+        the configured host. A fixed list of names, so a DNS-rebound name is refused."""
+        hosts = {"127.0.0.1", "localhost", str(self.config["server"].get("host", "127.0.0.1"))}
+        return sorted(f"http://{h}:{port}" for h in hosts - {"0.0.0.0", "::", ""})
+
+    def origin_allowed(self, origin: Optional[str], port: int) -> bool:
+        """For browser connections to /ws, which CORS does not cover. Clients that send
+        no Origin (scripts, tests) are not browsers and are let through."""
+        extra = self.config["server"].get("cors_origins", [])
+        return origin is None or origin in self.own_origins(port) or origin in extra
+
     def setup_middleware(self):
-        """Configure CORS and other middleware."""
+        """CORS: the dashboard is served by this server, so it needs none. Only its own
+        origins (and any listed under server.cors_origins) may read API responses."""
+        server = self.config["server"]
         self.app.add_middleware(
             CORSMiddleware,
-            allow_origins=["*"],
-            allow_credentials=True,
-            allow_methods=["*"],
-            allow_headers=["*"],
+            allow_origins=self.own_origins(server.get("port", 8000)) + list(server.get("cors_origins", [])),
+            allow_methods=["GET", "POST"],
+            allow_headers=["Content-Type"],
         )
 
     def setup_static_files(self):
-        """Mount static file directories."""
+        """Mount the dashboard's static files. data/ is not served: generated code is
+        downloaded through /api/code/files/ only."""
         # Mount frontend subdirectories at root level
         self.app.mount("/css", StaticFiles(directory="frontend/css"), name="css")
         self.app.mount("/js", StaticFiles(directory="frontend/js"), name="js")
         self.app.mount("/frontend", StaticFiles(directory="frontend"), name="frontend")
-        self.app.mount("/data", StaticFiles(directory="data"), name="data")
+
+    def code_generation_settings(self) -> Dict:
+        return {**CODE_GENERATION_DEFAULTS, **self.config.get("code_generation", {})}
 
     def setup_routes(self):
         """Configure HTTP and WebSocket routes."""
@@ -179,13 +214,33 @@ class WMGDigitalTwinServer:
         
         @self.app.post("/api/code/generate")
         async def generate_plc_code():
-            """Generate IEC 61499 compliant PLC code from trained model."""
+            """Export the trained Q-network as an IEC 61499 Basic FB that executes it.
+
+            "code" is the .fbt (EcoStruxure Automation Expert dialect). The other
+            fields name the files written (.fbt and IEC 61131-3 .st) and their
+            download URLs, the network size and cost, the check of the FB against
+            the network (Q-values, argmax and setpoints; a failed check is a 500
+            and nothing is kept) and the FB type compiler's messages."""
             if not self.rl_agent or not self.rl_agent.is_trained():
                 raise HTTPException(status_code=400, detail="Model not trained")
-            
-            code = await self.generate_optimized_code()
-            return {"code": code, "generated_at": datetime.now().isoformat()}
-        
+
+            try:
+                code = await self.generate_optimized_code()
+            except (RuntimeError, ValueError) as e:
+                logger.error(f"PLC code generation failed: {e}")
+                raise HTTPException(status_code=500, detail=f"PLC code generation failed: {e}")
+            return {"code": code, "generated_at": datetime.now().isoformat(), **self.code_export_details()}
+
+        @self.app.get("/api/code/files/{export_id}/{file_name}")
+        async def download_generated_code(export_id: str, file_name: str):
+            """A generated .fbt or .st from <code_generation.output_dir>/<export_id>/."""
+            base = Path(self.code_generation_settings()["output_dir"]).resolve()
+            path = (base / export_id / file_name).resolve()
+            if path.parent.parent != base or path.suffix not in (".fbt", ".st") or not path.is_file():
+                raise HTTPException(status_code=404, detail="No such generated file")
+            media_type = "application/xml" if path.suffix == ".fbt" else "text/plain; charset=utf-8"
+            return FileResponse(path, media_type=media_type, filename=path.name)
+
         @self.app.get("/api/performance/history")
         async def get_performance_history():
             """Get historical performance data."""
@@ -197,6 +252,11 @@ class WMGDigitalTwinServer:
         @self.app.websocket("/ws")
         async def websocket_endpoint(websocket: WebSocket):
             """Main WebSocket endpoint for real-time communication."""
+            port = (websocket.scope.get("server") or (None, None))[1]
+            if not self.origin_allowed(websocket.headers.get("origin"), port):
+                logger.warning(f"Refused WebSocket connection from origin {websocket.headers.get('origin')}")
+                await websocket.close(code=1008)  # policy violation; the handshake is rejected
+                return
             await self.connection_manager.connect(websocket)
             logger.info(f"Client connected. Total connections: {len(self.connection_manager.active_connections)}")
             
@@ -256,10 +316,20 @@ class WMGDigitalTwinServer:
                 await self.reset_training_system()
                 
             elif action == "generate_code":
-                code = await self.generate_optimized_code()
+                try:
+                    code = await self.generate_optimized_code()
+                except (RuntimeError, ValueError) as e:  # not trained, or the FB failed its check
+                    logger.error(f"PLC code generation failed: {e}")
+                    await self.connection_manager.send_personal_message({
+                        "type": "plc_code_error",
+                        "detail": f"PLC code generation failed: {e}",
+                        "timestamp": datetime.now().isoformat()
+                    }, websocket)
+                    return
                 await self.connection_manager.send_personal_message({
                     "type": "plc_code",
                     "code": code,
+                    **self.code_export_details(),
                     "timestamp": datetime.now().isoformat()
                 }, websocket)
                 
@@ -443,31 +513,99 @@ class WMGDigitalTwinServer:
         })
 
     async def generate_optimized_code(self) -> str:
-        """Generate optimized PLC code from the trained RL model."""
+        """Export the trained Q-network as PLC code that executes it.
+
+        Writes an IEC 61499 Basic FB (<fb_name>.fbt, the form EcoStruxure Automation
+        Expert imports) and the same logic as an IEC 61131-3 FUNCTION_BLOCK (.st) to
+        <output_dir>/<timestamp>/, replays recent replay-buffer states through the
+        generated .fbt to compare it with the network, and returns the .fbt text.
+        The other export details are kept in self.last_code_export.
+        """
         if not self.rl_agent or not self.rl_agent.is_trained():
             raise ValueError("RL agent not trained")
-        
-        # Get optimal policy from trained agent
-        optimal_policy = self.rl_agent.get_optimal_policy()
-        
-        # Generate IEC 61499 compliant code
-        plc_code = self.plc_generator.generate_code(
-            policy=optimal_policy,
-            environment_config=self.automation_environment.get_config(),
-            performance_targets=self.get_performance_targets()
-        )
-        
-        # Save generated code
-        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-        code_file = f"data/generated_code/wmg_optimized_{timestamp}.st"
-        
-        os.makedirs(os.path.dirname(code_file), exist_ok=True)
-        with open(code_file, 'w') as f:
-            f.write(plc_code)
-        
-        logger.info(f"Generated PLC code saved to {code_file}")
-        
-        return plc_code
+
+        settings = self.code_generation_settings()
+        async with self.code_lock:
+            # Copy the weights, the reference network and the check states here, in the
+            # event loop: training keeps updating the live network while the export runs
+            # in a worker thread, and building a network draws from torch's RNG.
+            optimal_policy = self.rl_agent.get_optimal_policy()
+            policy = iec61499_exporter.policy_from_state_dict(optimal_policy["model_state"], {
+                "origin": "WMG RL Digital Twin server /api/code/generate",
+                "gradient_steps": optimal_policy["training_steps"],
+                "episodes_completed": self.current_episode,
+                "epsilon": optimal_policy["epsilon"],
+            })
+            recent = itertools.islice(reversed(self.rl_agent.memory.buffer), int(settings["verify_states"]))
+            states = [transition[0] for transition in recent]  # states the environment produced
+            reference = iec61499_exporter.reference_network(policy) if states else None
+            options = iec61499_exporter.ExportOptions(name=settings["fb_name"], namespace=settings["namespace"],
+                                                      state_input=settings["state_input"])
+            out_dir = self._new_code_dir(Path(settings["output_dir"]))
+            export = await asyncio.to_thread(self._export_policy_code, policy, options, out_dir, states,
+                                             reference, bool(settings["eae_check"]),
+                                             float(settings["tie_tolerance"]))
+            self.last_code_export = export
+
+        check = export["verification"]
+        summary = (f"replay-buffer {iec61499_exporter.verification_summary(check)}" if check
+                   else "not checked against the network")
+        logger.info(f"Generated IEC 61499 FB {export['fb_type']} in {export['files']['fbt']} ({summary})")
+
+        return export["code"]
+
+    def code_export_details(self) -> Dict:
+        """The last code export without the code text, for API responses."""
+        return {k: v for k, v in (self.last_code_export or {}).items() if k != "code"}
+
+    @staticmethod
+    def _new_code_dir(base: Path) -> Path:
+        """<base>/<timestamp>, with a numeric suffix if that folder already exists."""
+        stamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        out, n = base / stamp, 2
+        while out.exists():
+            out, n = base / f"{stamp}_{n}", n + 1
+        return out
+
+    @staticmethod
+    def _export_policy_code(policy, options, out_dir: Path, states, reference, eae_check: bool,
+                            tie_tolerance: float = 0.0) -> Dict:
+        """Worker-thread part of generate_optimized_code: works on copies only."""
+        result = iec61499_exporter.export(policy, out_dir, options)
+        verification = None
+        if states:
+            verification = iec61499_exporter.verify_fbt(result.fbt_path, policy, states, net=reference,
+                                                        tie_tolerance=tie_tolerance,
+                                                        action_output=options.action_output)
+            if not verification["ok"]:
+                shutil.rmtree(out_dir, ignore_errors=True)  # do not leave a wrong FB behind
+                raise RuntimeError(f"the generated FB failed its check against the Q-network "
+                                   f"({iec61499_exporter.verification_summary(verification)}): {verification}")
+        eae_compile = None
+        compiler = eae_fbtype_compiler.find_fbtype_compiler() if eae_check else None
+        if compiler is not None:
+            report = eae_fbtype_compiler.compile_fbt(result.fbt_path, out_dir / "eae_build", compiler)
+            # ok: the FB type compiler accepted the type; not an EAE solution import, not a runtime test.
+            # The message lines are as the compiler printed them, in the three groups of classify().
+            eae_compile = {"ok": report.ok, "compiler": str(compiler), "exit_code": report.returncode,
+                           "bin_bytes": report.bin_bytes, "errors": report.errors, "warnings": report.warnings,
+                           "context_messages": report.context_messages}
+            if not report.ok:
+                logger.warning(f"EAE FBTypeCompiler rejected {result.fbt_path}: {report.summary()}")
+        return {
+            "code": result.fbt_path.read_text(encoding="utf-8"),
+            "format": "IEC 61499-2 Basic FB type (.fbt), EcoStruxure Automation Expert dialect",
+            "fb_type": f"{options.namespace}.{options.name}",
+            "files": {"fbt": str(result.fbt_path), "st": str(result.st_path)},
+            "downloads": {kind: f"/api/code/files/{out_dir.name}/{path.name}"
+                          for kind, path in (("fbt", result.fbt_path), ("st", result.st_path))},
+            "network": policy.sizes,
+            "parameters": policy.n_params,
+            "macs_per_decision": policy.macs,
+            "weights_sha256": policy.sha256,
+            "verification": verification,
+            "eae_compile": eae_compile,
+        }
 
     async def handle_robot_update(self, robot_data: Dict):
         """Handle robot state updates from frontend."""

@@ -5,9 +5,12 @@
  * This module manages real-time bidirectional communication between the frontend
  * digital twin interface and the backend reinforcement learning system through
  * WebSocket connections with automatic reconnection and message queuing.
+ *
+ * Loaded as a plain <script> by wmg-digital-twin.html, so it defines a global class
+ * rather than using ES module exports.
  */
 
-export class WebSocketManager {
+class WebSocketManager {
     constructor(url = 'ws://localhost:8000/ws') {
         this.url = url;
         this.websocket = null;
@@ -561,6 +564,3 @@ export class WebSocketManager {
         this.websocket = null;
     }
 }
-
-// Export default instance for convenience
-export default WebSocketManager;
