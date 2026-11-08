@@ -1,0 +1,25 @@
+policy,metric,mean,ci95
+Uniform random,total_reward,1715.9948147363652,1.1940478104440897
+Before: untrained DQN,total_reward,1713.6473648119563,1.8932367472065876
+After: trained DQN (dropout on),total_reward,1682.5823106649957,0.13732192890791486
+After: trained DQN (eval mode),total_reward,1682.5823106649957,0.13732192890791486
+Generated ST code,total_reward,1622.0175036146957,0.13732192890790515
+Best fixed action (Energy saving),total_reward,1827.377951324987,0.1373219289078894
+Uniform random,energy_efficiency,0.5300196508258762,0.0012744783857135014
+Before: untrained DQN,energy_efficiency,0.5298008747265064,0.0034065079492239503
+After: trained DQN (dropout on),energy_efficiency,0.47681487662415006,3.280499401972041e-17
+After: trained DQN (eval mode),energy_efficiency,0.47681487662415006,3.280499401972041e-17
+Generated ST code,energy_efficiency,0.407830342577488,2.1869996013146937e-17
+Best fixed action (Energy saving),energy_efficiency,0.7225433526011558,2.1869996013146937e-17
+Uniform random,quality_mean,0.9512252101213619,0.0003148294861265802
+Before: untrained DQN,quality_mean,0.9607876726213618,0.00013725372897873802
+After: trained DQN (dropout on),quality_mean,0.9607947976213618,0.00013732192890789037
+After: trained DQN (eval mode),quality_mean,0.9607947976213618,0.00013732192890789037
+Generated ST code,quality_mean,0.9465447976213619,0.00013732192890789554
+Best fixed action (Energy saving),quality_mean,0.9180447976213618,0.00013732192890789422
+Uniform random,throughput,3.5,0.0
+Before: untrained DQN,throughput,3.12,0.04206500020711093
+After: trained DQN (dropout on),throughput,3.0,0.0
+After: trained DQN (eval mode),throughput,3.0,0.0
+Generated ST code,throughput,2.5,0.0
+Best fixed action (Energy saving),throughput,5.5,0.0
