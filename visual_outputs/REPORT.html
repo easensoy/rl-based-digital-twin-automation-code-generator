@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>RL Digital Twin Assessment</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Condensed:wght@500;600&family=IBM+Plex+Sans:ital,wght@0,400;0,600;1,400&family=IBM+Plex+Mono:wght@400&display=swap" rel="stylesheet">
+<style>
+/* Layout idea: an A4 engineering memo. Header band, two text columns, results table and a figure strip; prints to one page. */
+:root {
+  --paper: #fbfaf7;
+  --ink: #17191e;
+  --muted: #5a5e66;
+  --rule: #d8d5cd;
+  --accent: #24557f;
+  --fill: #f1efe9;
+  --ok: #1f7a3c;
+  --part: #9a5b00;
+  --miss: #b0271f;
+  --display: "IBM Plex Sans Condensed", "Arial Narrow", system-ui, sans-serif;
+  --body: "IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
+  --mono: "IBM Plex Mono", Consolas, monospace;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #15171b; --ink: #ecebe6; --muted: #a9adb5; --rule: #34373e; --accent: #8fb8de;
+    --fill: #1f2228; --ok: #6cc489; --part: #e0a54a; --miss: #ef7d74; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --paper: #15171b; --ink: #ecebe6; --muted: #a9adb5; --rule: #34373e; --accent: #8fb8de;
+  --fill: #1f2228; --ok: #6cc489; --part: #e0a54a; --miss: #ef7d74; color-scheme: dark;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; background: var(--paper); color: var(--ink); }
+body { font: 14px/1.45 var(--body); }
+main { max-width: 1120px; margin: 0 auto; padding: 28px 20px 36px; display: grid; gap: 18px; }
+header { border-bottom: 2px solid var(--accent); padding-bottom: 10px; display: grid; gap: 4px; }
+h1 { font: 600 27px/1.15 var(--display); margin: 0; text-wrap: balance; letter-spacing: 0.1px; }
+.meta { color: var(--muted); font-size: 13px; }
+.meta code, td code, li code, p code { font: 12px var(--mono); }
+.scope { margin: 4px 0 0; max-width: 95ch; }
+.cols { display: grid; grid-template-columns: 1fr 1fr; gap: 22px; align-items: start; }
+section { display: grid; gap: 6px; }
+h2 { font: 600 15.5px/1.2 var(--display); margin: 0; color: var(--accent); text-transform: uppercase; letter-spacing: 0.6px; }
+ul, ol { margin: 0; padding-left: 18px; display: grid; gap: 4px; }
+li b { font-weight: 600; }
+.tag { display: inline-block; font: 600 10.5px/1 var(--body); padding: 3px 6px 2px; border-radius: 3px;
+       letter-spacing: 0.3px; text-transform: uppercase; vertical-align: 1px; margin-right: 4px; border: 1px solid; }
+.ok { color: var(--ok); } .part { color: var(--part); } .miss { color: var(--miss); }
+table { border-collapse: collapse; width: 100%; font-size: 13px; font-variant-numeric: tabular-nums; }
+th, td { text-align: left; padding: 5px 6px; border-bottom: 1px solid var(--rule); vertical-align: top; }
+th { font-weight: 600; color: var(--muted); font-size: 12px; }
+td.num, th.num { text-align: right; }
+tr.after td { background: var(--fill); font-weight: 600; }
+.note { color: var(--muted); font-size: 12.5px; }
+.figs { display: grid; grid-template-columns: 1.35fr 1fr; gap: 14px; }
+figure { margin: 0; display: grid; gap: 4px; }
+figure a { display: block; border: 1px solid var(--rule); border-radius: 4px; overflow: hidden; background: #fcfcfb; }
+figure img { display: block; width: 100%; height: auto; }
+figcaption { font-size: 12px; color: var(--muted); }
+.list-out { columns: 2; column-gap: 22px; font-size: 13px; color: var(--muted); }
+.list-out span { display: block; break-inside: avoid; }
+a { color: var(--accent); }
+a:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+@media (max-width: 760px) { .cols, .figs { grid-template-columns: 1fr; } .list-out { columns: 1; } }
+@media print {
+  @page { size: A4; margin: 8mm 9mm; }
+  body { font-size: 7.55pt; line-height: 1.27; }
+  main { padding: 0; gap: 5px; max-width: none; }
+  header { padding-bottom: 4px; gap: 2px; }
+  h1 { font-size: 13.5pt; } .meta, .note, figcaption, .list-out { font-size: 6.8pt; }
+  h2 { font-size: 8.4pt; } table { font-size: 7.1pt; } th { font-size: 6.8pt; } th, td { padding: 1.5px 3px; }
+  .cols { gap: 11px; } .cols > div { gap: 6px !important; } ul, ol { gap: 1px; padding-left: 13px; } section { gap: 2px; }
+  .figs { grid-template-columns: 1.45fr 1fr; gap: 8px; align-items: start; }
+  .figs img { max-height: 62mm; object-fit: contain; }
+  .tag { font-size: 6pt; padding: 1px 3px 0.5px; }
+  .list-out { margin: 0; }
+}
+</style>
+</head>
+<body>
+<main>
+  <header>
+    <h1>RL Digital Twin and PLC Code Generator: Technical Assessment</h1>
+    <div class="meta">Emin Alper Sensoy · Automation Systems Group, WMG · 6 November 2026 · repository commit <code>898c112</code></div>
+    <p class="scope">The repository was installed in a new Python 3.11 environment and executed end to end: training through the backend REST API, then PLC code generation from the trained policy. It was assessed against the descriptions given in its docstrings, user interface and dependency list; the README file is empty.</p>
+  </header>
+
+  <div class="cols">
+    <div style="display:grid; gap:14px">
+      <section>
+        <h2>Implemented and verified</h2>
+        <ul>
+          <li><span class="tag ok">works</span>REST endpoints and a WebSocket channel are served by the FastAPI backend. 1,000 training episodes (200,000 simulation steps) were completed in 189 s, with one progress and one metrics message broadcast per episode.</li>
+          <li><span class="tag ok">works</span>A PyTorch DQN is implemented (Q-network 12-128-128-128-6, target network, replay buffer, ε-greedy exploration). Training is completed without errors on CPU.</li>
+          <li><span class="tag ok">works</span>A 290-line IEC 61131-3 Structured Text file is generated and stored on request.</li>
+          <li><span class="tag ok">works</span>All 34 pinned dependencies are installed on Python 3.11 without resolver conflicts.</li>
+        </ul>
+      </section>
+      <section>
+        <h2>Stubbed or missing</h2>
+        <ul>
+          <li><span class="tag miss">frontend</span>Three script files written as ES modules are loaded as classic scripts, and an undefined method is called during 3D set-up, so initialisation is stopped before any control is wired. Fixed demonstration values are displayed (OEE 91.8%, episode 525), the 3D view is left black and no backend data is shown.</li>
+          <li><span class="tag part">twin</span>The simulated process is a 12-variable stochastic model with no link to a plant, PLC, OPC UA server or the 3D robot model. An 18-state, 8-action environment is present in the code but not imported.</li>
+          <li><span class="tag miss">policy to code</span>Only two values from training (exploration rate and step count) are written into the generated file; the network weights are not used. Fixed coefficients are held in the block named RL optimiser, and the "Aggressive" setpoint is selected in every state: 0% agreement with the trained network.</li>
+          <li><span class="tag miss">IEC 61499</span>No event interface, ECC or .fbt output is produced. Function blocks are declared inside the PROGRAM, so the file is not compilable as one unit; restructuring is required before import into EAE or TIA Portal. Sensor reads are commented out, so a permanent stop is held by the safety block until I/O is mapped.</li>
+          <li><span class="tag miss">other</span>OPC UA, Modbus, authentication and task-queue packages are listed but not imported. No test is defined (both test files are empty). The pinned PyTorch build is CPU-only, so the RTX 1000 Ada GPU is not used.</li>
+        </ul>
+      </section>
+    </div>
+
+    <div style="display:grid; gap:14px">
+      <section>
+        <h2>Training results</h2>
+        <table>
+          <thead><tr><th>Policy (default configuration)</th><th class="num">Reward / episode</th><th class="num">Energy eff.</th><th>Actions selected</th></tr></thead>
+          <tbody>
+            <tr><td>Untrained network (before)</td><td class="num">1,713.7</td><td class="num">0.530</td><td>Balanced 63%, Quality focus 37%</td></tr>
+            <tr class="after"><td>Trained network (after)</td><td class="num">1,682.6</td><td class="num">0.477</td><td>Quality focus 100%</td></tr>
+            <tr><td>Generated ST code</td><td class="num">1,622.0</td><td class="num">0.408</td><td>Aggressive 100%</td></tr>
+            <tr><td>Fixed "Energy saving" action</td><td class="num">1,827.4</td><td class="num">0.723</td><td>Energy saving 100%</td></tr>
+          </tbody>
+        </table>
+        <p class="note" style="margin:2px 0 0">Mean of 100 evaluation episodes per policy on identical seeds; 95% intervals are below ±2. The episode reward was reduced by 1.8% through training. Across six seeds, one action was selected by each trained policy in every state, and that action changed with the seed; a mean reward of 1,682.8 was obtained, against 1,716.0 for uniform random actions, and the reward-maximising action was not found in any seed. An increase in temporal difference loss from 72 to 7,847 was observed, with one gradient step taken per 200 simulation steps.</p>
+      </section>
+      <section>
+        <h2>Relation to the VueOne and EAE work</h2>
+        <ul>
+          <li>Process setpoint selection is addressed by this repository; control structure (VueOne component states, sequences and interlocks injected into CAT templates for EAE) is addressed by the OSDA Mapper.</li>
+          <li>An integration point is identified: a trained policy can be packaged as an IEC 61499 Basic FB (REQ and CNF events, an ST algorithm holding the network weights) that supplies setpoints to CAT-based component logic, while interlocks remain enforced by the Mapper-generated layer.</li>
+          <li>The same pattern as CAT injection is followed by <code>plc_generator.py</code>, without an IEC 61499 schema, a source model or validation.</li>
+        </ul>
+      </section>
+      <section>
+        <h2>Three next improvements</h2>
+        <ol>
+          <li><b>Policy in the code.</b> The trained weights are to be exported into an IEC 61499 Basic FB (.fbt) with constant arrays and an ST forward pass, verified by replaying recorded states through the network and an ST emulation; acceptance criterion: 100% action agreement.</li>
+          <li><b>Twin that matches the rig.</b> Training is to be run against the Visual Components virtual commissioning model through OPC UA, with states taken from real component signals and VueOne interlocks applied as action masks, so that learned behaviour transfers to the SMC rig.</li>
+          <li><b>Learning that beats baselines.</b> One gradient step per simulation step, a reward defined from observable state, checkpointing, loss logging and unit tests are to be added, and a policy is to be accepted only when the best fixed action is exceeded. For low-dimensional setpoint tuning, Bayesian optimisation is to be evaluated; about 500 experiments on a physical testbed were reported for it in the GPU-accelerated control hardware article (University of Stuttgart, 2021).</li>
+        </ol>
+      </section>
+    </div>
+  </div>
+
+  <div class="figs">
+    <figure>
+      <a href="05_before_after_process_metrics.png"><img src="05_before_after_process_metrics.png" alt="Dot plot of reward, energy efficiency, quality and throughput for six policies: the trained DQN scores below the untrained network and the best fixed action"></a>
+      <figcaption>Figure 1. Process metrics before and after training, with the generated code and reference policies (file 05).</figcaption>
+    </figure>
+    <figure>
+      <a href="screenshots/01_frontend_served_during_training.png"><img src="screenshots/01_frontend_served_during_training.png" alt="Frontend during training: static demonstration values, Simulation badge and a black 3D canvas"></a>
+      <figcaption>Figure 2. Frontend captured while the backend was at about episode 400; the values shown are fixed in the HTML (screenshot 01).</figcaption>
+    </figure>
+  </div>
+  <p class="list-out">
+    <span><a href="01_reward_curve.png">01 reward curve</a> · <a href="02_loss_curve.png">02 loss</a> · <a href="03_epsilon_decay.png">03 ε decay</a></span>
+    <span><a href="04_action_distribution.png">04 action distribution</a> · <a href="06_digital_twin_process_state.png">06 twin state</a> · <a href="07_plc_code_structure.png">07 code structure</a></span>
+  </p>
+</main>
+</body>
+</html>
