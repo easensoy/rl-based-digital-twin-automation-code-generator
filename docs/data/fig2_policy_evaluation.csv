@@ -1,0 +1,20 @@
+production_model,policy,chosen_action,mean_reward,ci95,ci95_over
+legacy,best fixed action (Energy saving),,1827.38,0.137,episodes
+legacy,uniform random,,1715.99,1.194,episodes
+legacy,"untrained network (seed-42 initialisation, 2026-11-06 run, same 100 episodes)",,1713.65,1.893,episodes
+legacy,"trained DQN, seed 42",Aggressive,1622.02,0.137,episodes
+legacy,"trained DQN, seed 1",Quality focus,1682.58,0.137,episodes
+legacy,"trained DQN, seed 2",Aggressive,1622.02,0.137,episodes
+legacy,"trained DQN, seed 3",Balanced,1744.05,0.137,episodes
+legacy,"trained DQN, seed 4",Balanced,1744.05,0.137,episodes
+legacy,"trained DQN, seed 5",Aggressive,1622.02,0.137,episodes
+legacy,"trained DQN, mean of 6 seeds",,1672.79,62.942,"training seeds (Student t, n=6)"
+speed_proportional,best fixed action (Energy saving),,1771.55,0.137,episodes
+speed_proportional,uniform random,,1706.08,0.872,episodes
+speed_proportional,"trained DQN, seed 42",Aggressive,1639.78,0.137,episodes
+speed_proportional,"trained DQN, seed 1",Normal,1715.54,0.137,episodes
+speed_proportional,"trained DQN, seed 2",Quality focus,1691.06,0.137,episodes
+speed_proportional,"trained DQN, seed 3",Aggressive,1639.78,0.137,episodes
+speed_proportional,"trained DQN, seed 4",Quality focus,1691.06,0.137,episodes
+speed_proportional,"trained DQN, seed 5",Aggressive,1639.78,0.137,episodes
+speed_proportional,"trained DQN, mean of 6 seeds",,1669.50,35.434,"training seeds (Student t, n=6)"

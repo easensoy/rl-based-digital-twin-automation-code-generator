@@ -1,0 +1,13 @@
+quantity,value,source in docs/data/export_verification.json
+networks with every Q-value within q_tolerance,18 of 18,networks[].checks.q_values
+largest |dQ| over all networks and states,7.3242e-04,networks[].max_abs_q_diff
+networks passing the strict gate (tie tolerance 0),17 of 18,networks[].ok
+states where the rejected network's action differs,2 of 20000,networks[speed_proportional_seed5].argmax_disagreements
+injected defects rejected,10 of 10,mutations[].ok
+networks whose .st was run in the interpreter,1 of 18,st_check.network
+.st Q-values and outputs identical to the .fbt,True,"st_check.q_bit_identical_to_fbt, .outputs_identical_to_fbt"
+exports accepted by the EAE type compiler,2 of 2,eae.accepted[].ok
+unfiltered compiler errors / warnings,0 / 0,"eae.accepted[].errors, .warnings"
+known standalone-compile messages per export (kept raw),23,eae.accepted[].known_standalone_messages
+broken variants rejected by the compiler check,3 of 3,eae.negative_controls[].ok
+"execution on a controller, cycle time",not verified,
