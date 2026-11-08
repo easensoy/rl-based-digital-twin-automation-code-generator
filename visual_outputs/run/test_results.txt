@@ -1,0 +1,18 @@
+### pytest tests/ -v  (Python 3.11.14)
+============================= test session starts =============================
+platform win32 -- Python 3.11.14, pytest-7.4.3, pluggy-1.7.0 -- C:\rl-based-digital-twin-automation-code-generator\.venv\Scripts\python.exe
+rootdir: C:\rl-based-digital-twin-automation-code-generator
+plugins: anyio-3.7.1, platformdirs-4.14.5, asyncio-0.21.1
+asyncio: mode=Mode.STRICT
+collecting ... collected 0 items
+
+============================ no tests ran in 0.02s ============================
+pytest exit code: 5
+
+### node tests/test_kinematics.js  (node v22.17.1)
+node exit code: 0
+
+### file sizes
+0 tests/test_rl_agent.py
+0 tests/test_kinematics.js
+0 total
