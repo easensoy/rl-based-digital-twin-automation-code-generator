@@ -1,0 +1,54 @@
+{
+ "tag": "pilot",
+ "episodes": 200,
+ "workers": 18,
+ "started": "2026-11-08T23:58:10",
+ "finished": "2026-11-09T00:02:38",
+ "wall_s": 267.5,
+ "cpu_count": 22,
+ "jobs": [
+  {
+   "condition": "I5",
+   "seed": 101,
+   "returncode": 0,
+   "wall_s": 267.5
+  },
+  {
+   "condition": "I4",
+   "seed": 101,
+   "returncode": 0,
+   "wall_s": 257.5
+  },
+  {
+   "condition": "R1",
+   "seed": 101,
+   "returncode": 0,
+   "wall_s": 258.0
+  },
+  {
+   "condition": "I3",
+   "seed": 101,
+   "returncode": 0,
+   "wall_s": 245.6
+  },
+  {
+   "condition": "I2",
+   "seed": 101,
+   "returncode": 0,
+   "wall_s": 260.3
+  },
+  {
+   "condition": "I1",
+   "seed": 101,
+   "returncode": 0,
+   "wall_s": 41.2
+  },
+  {
+   "condition": "I0",
+   "seed": 101,
+   "returncode": 0,
+   "wall_s": 43.5
+  }
+ ],
+ "failed": []
+}
