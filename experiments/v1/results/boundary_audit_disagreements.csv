@@ -1,0 +1,4 @@
+network,corpus,index,source,margin_f64,action_f64,action_torch,action_st,action_fbt,q_gap_torch,q_gap_st,setpoint_delta
+speed_proportional_seed5,A,13327,synthetic,8.949201776431437e-05,4,4,2,2,0.0001220703125,0.0,"[0.10000000149011612, 0.05000000074505806, 0.15000000596046448]"
+speed_proportional_seed5,A,14848,synthetic,7.228557751659537e-05,4,4,2,2,0.0001220703125,0.0,"[0.10000000149011612, 0.05000000074505806, 0.15000000596046448]"
+speed_proportional_seed5,A,16995,synthetic,5.526581787762552e-06,4,2,2,2,0.0,0.0,"[0.0, 0.0, 0.0]"
