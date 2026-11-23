@@ -1,0 +1,13 @@
+condition,family,minus_rule_EUR,t_halfwidth,fail_any_rate
+I0,sensor_bias_low,-64.883,70.627,0.9083
+I0,sensor_bias_high,-389.555,196.355,1.0
+I0,saturation,-136.932,79.047,0.8883
+I0,delay,-87.066,97.799,0.6767
+I0,cold_saturation,-150.243,80.463,0.9033
+I0,bias_lag,-73.072,70.892,0.905
+I5,sensor_bias_low,-85.303,87.826,0.9367
+I5,sensor_bias_high,-214.993,191.669,0.8967
+I5,saturation,-84.91,25.255,0.9117
+I5,delay,-35.946,8.44,0.0667
+I5,cold_saturation,-125.038,17.114,0.9967
+I5,bias_lag,-91.012,90.277,0.8717
