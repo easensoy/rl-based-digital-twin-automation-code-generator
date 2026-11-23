@@ -160,7 +160,7 @@ def main() -> None:
                 "argmax keeps the first maximum: Aggressive, with Aggressive's setpoints. Every Q-value stays within "
                 "the 1e-3 tolerance, so a Q-only check would accept this export; the strict gate rejects it.",
         "generated_by": "docs/scripts/extract_near_tie_fixture.py (deterministic: no timestamp, so the file hash is stable)",
-        "measurement": f"docs/data/export_verification.json, generated {stored['generated_at']}",
+        "measurement": "docs/data/export_verification.json: the state-set, checkpoint and .fbt hashes below match it",
         "values": "float32 values written as exact decimals; *_bits are the IEEE 754 binary32 patterns",
         "checkpoint": {"path": entry["source"], "sha256": entry["source_sha256"], "weights_sha256": entry["weights_sha256"],
                        "origin": "multi-seed evaluation of 2026-11-07: training seed 5, corrected "
@@ -170,7 +170,8 @@ def main() -> None:
                                       "simulator under uniform random actions, then 10,000 draws uniform in [-2, 2]^12, "
                                       "both seeded 20261108, as float32",
                       "seed": measure.STATE_SEED, "n_rollout": measure.N_ROLLOUT, "n_box": measure.N_BOX,
-                      "n": int(len(x)), "float32_sha256": x_sha, "rejected_indices": idx},
+                      "n": int(len(x)), "float32_sha256": x_sha, "rejected_indices": idx,
+                      "reference_q_float32_sha256": hashlib.sha256(np.ascontiguousarray(q_ref_batch).tobytes()).hexdigest()},
         "state_names": list(ex.STATE_NAMES), "action_names": ACTION_NAMES,
         "setpoint_outputs": list(ex.SETPOINT_OUTPUTS),
         "reference": "rl_agent.DQNNetwork in eval mode, float32 CPU, evaluated on the full 20,000-state batch as the "
