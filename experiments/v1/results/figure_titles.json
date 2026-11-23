@@ -1,0 +1,8 @@
+{
+ "A": "With 60 times more gradient updates the DQN reaches the best fixed preset's margin; no training change closes the gap to the locked rule",
+ "B": "I5 trails the locked rule by 30-43 EUR per shift in every map cell and by 36-215 EUR in every fault family",
+ "C": "Trained on the throughput reward, R1 earns 10.8 EUR more of it than I3 by tripling scrap, and gains no margin",
+ "D": "Through a cold front with the heater capped at 60 %, the locked rule slows down and keeps curing: 112 EUR, against 35 for I5 and −115 for the best fixed preset",
+ "E": "No DQN run reaches the locked rule: the best feasible run is 17 EUR per shift below it, and 27 of 42 runs are infeasible",
+ "F": "The exported block changes the action on 2 of 360,000 corpus states, both synthetic near-ties, and on none of 360,000 visited states"
+}
