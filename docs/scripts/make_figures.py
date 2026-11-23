@@ -41,6 +41,7 @@ EVAL_V2 = REPO / "visual_outputs" / "run" / "eval_v2"
 EVAL_HIST = REPO / "visual_outputs" / "run" / "evaluation.json"
 LOSS_CSV = REPO / "visual_outputs" / "data" / "training_loss.csv"
 MEASURED = DATA_DIR / "export_verification.json"
+ST_MEASURED = DATA_DIR / "st_verification.json"
 NEAR_TIE = REPO / "tests" / "fixtures" / "near_tie_speed_proportional_seed5.json"
 NEAR_TIE_CSV = DATA_DIR / "near_tie_states.csv"
 
@@ -62,6 +63,7 @@ thousands = FuncFormatter(lambda v, _: f"{v:,.0f}")
 def setup(t):
     plt.rcParams.update({
         "font.family": "DejaVu Sans", "font.size": 9.5, "svg.fonttype": "path",
+        "svg.hashsalt": "make_figures",  # fixed SVG element ids, so regenerated files are byte-identical
         "text.color": t["ink"], "axes.labelcolor": t["ink2"], "axes.edgecolor": t["axis"],
         "xtick.color": t["ink2"], "ytick.color": t["ink2"],
         "axes.facecolor": "none", "figure.facecolor": "none", "savefig.facecolor": "none",
@@ -171,6 +173,22 @@ def measured_facts(m):
     )
 
 
+def st_facts():
+    """Standalone .st coverage and outcomes from docs/data/st_verification.json."""
+    s = load_json(ST_MEASURED)
+    a, b, m = s["corpus_a"]["networks"], s["corpus_b"], s["mutations"]
+    return dict(
+        a_tested=len(a), a_passed=sum(r["st"]["ok"] for r in a), a_status={r["id"]: r["st"]["ok"] for r in a},
+        a_rejected=[r["id"] for r in a if not r["st"]["ok"]], a_states=s["corpus_a"]["states"],
+        a_identical=sum(r["st_outputs_bit_identical_to_fbt"] for r in a),
+        a_replicated=sum(r["fbt_replicates_stored"] for r in a),
+        b_tested=len(b["networks"]), b_passed=sum(r["st"]["ok"] for r in b["networks"]), b_states=b["states"],
+        b_actions=sum(c > 0 for c in b["reference_action_counts"]),
+        b_max_dq=max(r["st"]["max_abs_q_diff"] for r in b["networks"]),
+        m_pairs=m["pairs"], m_reachable=m["reachable_pairs"], m_detected=m["detected_reachable"],
+        m_unreachable_detected=m["detected_unreachable"], generated_at=s["generated_at"])
+
+
 def load_eval():
     out = {}
     for model in ("legacy", "speed_proportional"):
@@ -257,29 +275,32 @@ def fig1(t, mode, f):
         for j, line in enumerate(lines):
             ax.text(x + 0.12, ty + th - 0.93 - 0.15 * j, line, fontsize=8.1, va="center", color=t["ink2"])
 
-    # the other artefact, the vendor compiler and the controller, each in its own tile
+    # the other artefact, the vendor compiler and the controller: what was tested, then the outcome
     by, bh2 = 0.6, 1.28
     bw3 = (W - 2 * tg) / 3
+    s = f["st"]
     lower = [
-        ("pass" if f["st_bit_identical"] else "reject", "passed: .st (IEC 61131-3)", f"{f['st_runs']} / {f['n']}",
-         ["network run (the server run):", "Q-values bit-identical to its",
-          f".fbt; the other {f['n'] - f['st_runs']}: not run"], False),
-        ("pass" if f["eae_accepted"] == f["eae_runs"] else "reject", "accepted: EAE type compiler",
-         f"{f['eae_accepted']} / {f['eae_runs']}",
-         [f".fbt exports (EAE {f['eae_version']}): no", "unfiltered errors or warnings;",
-          f"{f['neg_rejected']} / {f['neg_runs']} broken variants rejected"], False),
-        ("notverified", "on a controller", "not verified",
-         ["no import into an EAE solution,", "no deployment, no cycle time"], True),
+        ("warn" if s["a_passed"] < s["a_tested"] else "pass", "IEC 61131-3 .st, run separately",
+         [("tested", f"{s['a_tested']} of {f['n']}, same corpus"),
+          ("passed", f"{s['a_passed']}; rejected {s['a_tested'] - s['a_passed']} (the near-tie)"),
+          ("synthetic", f"{s['b_passed']} of {s['b_tested']} passed, 6 actions")], False),
+        ("pass" if f["eae_accepted"] == f["eae_runs"] else "reject", f"EAE {f['eae_version']} type compiler",
+         [("compiled", f"{f['eae_runs']} of {f['n']} .fbt exports"),
+          ("accepted", f"{f['eae_accepted']}, no unfiltered errors"),
+          ("broken", f"{f['neg_rejected']} of {f['neg_runs']} rejected")], False),
+        ("notverified", "target runtime", [("tested", "none: not verified"), ("", "no EAE solution, deployment,"),
+                                           ("", "execution or cycle time")], True),
     ]
-    for i, (kind, label, big, lines, dashed) in enumerate(lower):
+    for i, (kind, label, rows, dashed) in enumerate(lower):
         x = i * (bw3 + tg)
         card(ax, t, x, by, bw3, bh2, dashed=dashed)
         badge(ax, t, x + 0.2, by + bh2 - 0.2, kind)
         ax.text(x + 0.34, by + bh2 - 0.2, label, fontsize=8.3, fontweight="bold", va="center")
-        ax.text(x + 0.12, by + bh2 - 0.56, big, fontsize=17, fontweight="bold", va="center",
-                color=t["muted"] if dashed else t["ink"])
-        for j, line in enumerate(lines):
-            ax.text(x + 0.12, by + bh2 - 0.84 - 0.14 * j, line, fontsize=8.0, va="center", color=t["ink2"])
+        for j, (key, value) in enumerate(rows):
+            yy = by + bh2 - 0.56 - 0.22 * j
+            ax.text(x + 0.12, yy, key, fontsize=8.0, va="center", color=t["ink2"])
+            ax.text(x + 0.78, yy, value, fontsize=8.0, va="center", color=t["muted"] if dashed else t["ink"],
+                    fontweight="normal" if dashed else "bold")
     ax.text(0, 0.42, f"Sampled states: {f['n_rollout']:,} from simulator rollouts + {f['n_box']:,} uniform in [−2, 2]¹². "
             "Agreement on sampled states is not proof for every input,\nand acceptance by the type compiler is not "
             "evidence of correct execution on a controller. Measured 2026-11-08 on frozen weights.",
@@ -290,9 +311,13 @@ def fig1(t, mode, f):
             ("states where the rejected network's action differs", f"{dis} of {f['states']}",
              "networks[speed_proportional_seed5].argmax_disagreements"),
             ("injected defects rejected", f"{f['mutants_rejected']} of {f['mutants']}", "mutations[].ok"),
-            ("networks whose .st was run in the interpreter", f"{f['st_runs']} of {f['n']}", "st_check.network"),
-            (".st Q-values and outputs identical to the .fbt", str(f["st_bit_identical"]),
-             "st_check.q_bit_identical_to_fbt, .outputs_identical_to_fbt"),
+            ("networks whose .st was run (st_verification.json)", f"{f['st']['a_tested']} of {f['n']}",
+             "st_verification.json corpus_a.networks"),
+            ("of those, passing the strict gate", str(f["st"]["a_passed"]), "corpus_a.networks[].st.ok"),
+            (".st outputs bit-identical to the .fbt", f"{f['st']['a_identical']} of {f['st']['a_tested']}",
+             "corpus_a.networks[].st_outputs_bit_identical_to_fbt"),
+            ("synthetic .st corpus networks passing", f"{f['st']['b_passed']} of {f['st']['b_tested']}",
+             "corpus_b.networks[].st.ok"),
             ("exports accepted by the EAE type compiler", f"{f['eae_accepted']} of {f['eae_runs']}", "eae.accepted[].ok"),
             ("unfiltered compiler errors / warnings", f"{f['eae_errors']} / {f['eae_warnings']}",
              "eae.accepted[].errors, .warnings"),
@@ -523,14 +548,14 @@ def seed_key(nid):
 
 
 def fig4(t, mode, m, f):
-    W, H = WIDTH, 6.45
+    W, H = WIDTH, 6.75
     fig = plt.figure(figsize=(W, H))
     ax = canvas(fig, W, H)
+    s = f["st"]
     head(ax, t, H, f"Checks covered {f['n']} networks and all six actions; none ran on a controller",
          f"Measured 2026-11-08 on frozen weights. Each network: {f['states']:,} sampled states\n({f['n_rollout']:,} from "
          f"simulator rollouts + {f['n_box']:,} uniform in [−2, 2]¹²).")
     nets = {n["id"]: n for n in m["networks"]}
-    st_net = (m.get("st_check") or {}).get("network")
     compiled = set((m.get("eae") or {}).get("accepted", {}))
     cols = dict(q=2.66, act=3.1, sp=3.54, st=3.98, eae=4.42)
     strip0, pitch, sq = 1.0, 0.13, 0.095
@@ -541,7 +566,7 @@ def fig4(t, mode, m, f):
         ax.text(strip0 + a * pitch + sq / 2, hy, str(a), ha="center", va="center", fontsize=7.6, color=t["ink2"])
     ax.text(strip0 + 3 * pitch, hy + 0.17, "actions chosen", ha="center", va="center", fontsize=7.8, color=t["ink2"])
     ax.text(2.33, hy + 0.08, "max |ΔQ|", ha="right", va="center", fontsize=7.8, color=t["ink2"])
-    for key, lab in (("q", "Q-values"), ("act", "action"), ("sp", "setpoints"), ("st", ".st run"), ("eae", "EAE\ncompile")):
+    for key, lab in (("q", "Q-values"), ("act", "action"), ("sp", "setpoints"), ("st", ".st"), ("eae", "EAE\ncompile")):
         ax.text(cols[key], hy + 0.08, lab, ha="center", va="center", fontsize=7.8, color=t["ink2"], linespacing=1.1)
     y = hy - 0.24
     rows_out = []
@@ -564,7 +589,7 @@ def fig4(t, mode, m, f):
             marks = {"q": "pass" if n["checks"]["q_values"] else "reject",
                      "act": "pass" if n["checks"]["argmax"] else "reject",
                      "sp": "pass" if n["checks"]["setpoints"] else "reject",
-                     "st": "pass" if nid == st_net and f["st_identical"] else "notrun",
+                     "st": ("pass" if s["a_status"][nid] else "reject") if nid in s["a_status"] else "notrun",
                      "eae": ("pass" if m["eae"]["accepted"][nid]["ok"] else "reject") if nid in compiled else "notrun"}
             for key, kind in marks.items():
                 badge(ax, t, cols[key], y, kind, r=0.06)
@@ -580,10 +605,10 @@ def fig4(t, mode, m, f):
     n_act = sum(n["checks"]["argmax"] for n in nets.values())
     n_sp = sum(n["checks"]["setpoints"] for n in nets.values())
     for key, txt in (("q", f"{f['n_q_ok']}/{f['n']}"), ("act", f"{n_act}/{f['n']}"), ("sp", f"{n_sp}/{f['n']}"),
-                     ("st", f"{int(bool(st_net))} run"), ("eae", f"{len(compiled)} run")):
+                     ("st", f"{s['a_passed']}/{s['a_tested']}"), ("eae", f"{len(compiled)} run")):
         ax.text(cols[key], y - 0.04, txt, ha="center", va="center", fontsize=8.0, fontweight="bold")
-    ax.text(0, y - 0.3, "Actions: 0 Conservative · 1 Normal · 2 Aggressive · 3 Energy saving · 4 Quality focus · 5 Balanced",
-            fontsize=7.8, va="center", color=t["ink2"])
+    ax.text(0, y - 0.3, "Actions: 0 Conservative · 1 Normal · 2 Aggressive ·\n3 Energy saving · 4 Quality focus · 5 Balanced",
+            fontsize=7.8, va="top", color=t["ink2"], linespacing=1.35)
 
     # (b) injected defects
     x0 = 5.0
@@ -626,8 +651,19 @@ def fig4(t, mode, m, f):
         rows_out.append(("compiler_negative_control", ctl["defect"], code, "", "", "", "", "", "",
                          "rejected" if not ctl["ok"] else "ACCEPTED"))
 
+    # (e) standalone .st on the synthetic corpus, with the mutation matrix
+    ye = yc - 0.17 - 0.33 * len(m["eae"]["negative_controls"]) - 0.12
+    ax.text(x0, ye, f"e   .st, synthetic: {s['b_passed']} of {s['b_tested']} passed", fontsize=9.2, fontweight="bold",
+            va="bottom")
+    for k, line in enumerate([f"{s['b_tested']} networks × {s['b_states']:,} states, float64 reference:",
+                              f"all {s['b_actions']} actions, exact ties, box vertices, ±0,",
+                              f"subnormal and ±100 inputs; max |ΔQ| {sci(s['b_max_dq'])}",
+                              f"mutants detected on {s['m_detected']} of {s['m_reachable']} reachable pairs,",
+                              f"on {s['m_unreachable_detected']} of {s['m_pairs'] - s['m_reachable']} unreachable ones"]):
+        ax.text(x0, ye - 0.17 - 0.15 * k, line, fontsize=7.8, va="center", color=t["ink2"])
+
     # (d) not verified
-    yd = yc - 0.17 - 0.33 * len(m["eae"]["negative_controls"]) - 0.12
+    yd = ye - 0.17 - 0.15 * 4 - 0.22
     card(ax, t, x0, yd - 0.7, W - x0, 0.78, dashed=True)
     badge(ax, t, x0 + 0.17, yd - 0.06, "notverified")
     ax.text(x0 + 0.31, yd - 0.06, "Not verified", fontsize=8.6, fontweight="bold", va="center")
@@ -667,45 +703,44 @@ def supp_td(t, mode, ev):
     for i in range(len(rmse)):
         w = sorted(rmse[max(0, i - win // 2): i + win // 2 + 1])
         med.append(w[len(w) // 2])
-    gap = ev["hist_q_gap"]
     first = sorted(rmse[:50])[25]
     last = sorted(rmse[-50:])[25]
-    fig = plt.figure(figsize=(WIDTH, 4.1))
-    fig.text(0.0, 0.985, f"By the end of training the TD error is {last / gap:.0f}× the margin that decides the action",
+    fig = plt.figure(figsize=(WIDTH, 4.25))
+    fig.text(0.0, 0.985, f"Replay-minibatch RMS TD residual rose from {first:.1f} to {last:.0f} during training",
              ha="left", va="top", fontsize=12, fontweight="bold", color=t["ink"])
-    fig.text(0.0, 0.905, "Historical: one training run of the published server (2026-11-06, seed 42, default simulator), "
-             "1,000 gradient steps, one per\n200-step episode. TD error = √ of the logged mean-squared TD loss of each "
-             "batch of 64. Margin = best minus second-best\nQ-value of the final network, mean over the "
-             f"{ev['hist_q_gap_states']:,} states its greedy policy visited in evaluation.",
+    fig.text(0.0, 0.91, "Historical: one training run of the published server (2026-11-06, seed 42, default simulator), "
+             "1,000 gradient steps, one per\n200-step episode. Each value is √ of F.mse_loss over one minibatch of 64 "
+             "transitions drawn uniformly from the 10,000-\ntransition replay buffer, against r + 0.99·max Q_target(s′, ·) "
+             "from a target network synced every 10 steps. It is not\nnormalised by the Q-value scale and is not an "
+             "estimate of the action-value error.",
              ha="left", va="top", fontsize=9, color=t["ink2"], linespacing=1.4)
-    ax = fig.add_axes([0.075, 0.12, 0.9, 0.6])
+    ax = fig.add_axes([0.09, 0.11, 0.885, 0.55])
     ax.plot(steps, rmse, color=t["muted"], linewidth=0.6, alpha=0.55, zorder=2)
     ax.plot(steps, med, color=t["blue"], linewidth=2.0, zorder=3)
-    ax.axhline(gap, color=t["orange"], linewidth=1.3, linestyle=(0, (4, 3)), zorder=2)
     ax.set_xlim(0, 1000)
     ax.set_ylim(0, 180)
     ax.grid(axis="y")
     ax.set_axisbelow(True)
     ax.spines["left"].set_visible(False)
     ax.set_xlabel("Gradient step (one per training episode)", fontsize=9)
-    ax.set_ylabel("Q-value units", fontsize=9)
+    ax.set_ylabel("RMS TD residual (Q-value units)", fontsize=9)
     backing = dict(boxstyle="square,pad=0.15", facecolor=t["page"], edgecolor="none", alpha=0.9)
-    ax.text(985, 116, f"TD error (rolling median of 51): {last:.0f} over the last 50 steps", ha="right", va="bottom",
+    ax.text(985, 116, f"median of the last 50 minibatches: {last:.0f}", ha="right", va="bottom",
             fontsize=8.6, color=t["ink"], bbox=backing, zorder=5)
-    ax.annotate(f"TD error at the start: {first:.1f}", xy=(8, first + 1), xytext=(40, 62), fontsize=8.6,
+    ax.annotate(f"median of the first 50 minibatches: {first:.1f}", xy=(8, first + 1), xytext=(40, 62), fontsize=8.6,
                 color=t["ink2"], ha="left", va="bottom", bbox=backing, zorder=5,
                 arrowprops=dict(arrowstyle="-", color=t["ink2"], linewidth=0.8, shrinkA=2, shrinkB=2))
-    ax.text(985, gap + 3, f"margin between the two best actions: {gap:.1f}", ha="right", va="bottom", fontsize=8.6,
-            color=t["ink"], bbox=backing, zorder=5)
-    ax.text(330, 152, "grey: value of each batch", fontsize=8.3, color=t["ink2"], ha="left", bbox=backing, zorder=5)
-    write_csv("supp_td_error_vs_margin", ["gradient_step", "td_loss_mse", "td_error_rmse", "rmse_rolling_median_51"],
+    ax.text(330, 152, "grey: one minibatch per step · blue: rolling median of 51", fontsize=8.3, color=t["ink2"],
+            ha="left", bbox=backing, zorder=5)
+    write_csv("supp_td_residual", ["gradient_step", "minibatch_td_mse", "minibatch_rms_td_residual", "rolling_median_51"],
               [(s, f"{float(r['loss']):.4f}", f"{x:.4f}", f"{mm:.4f}") for s, r, x, mm in zip(steps, rows, rmse, med)])
-    save(fig, "supp_td_error_vs_margin", mode)
+    save(fig, "supp_td_residual", mode)
 
 
 def main():
     measured = load_json(MEASURED)
     facts = measured_facts(measured)
+    facts["st"] = st_facts()
     ev = load_eval()
     case = load_near_tie()
     for mode, t in THEMES.items():
