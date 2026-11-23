@@ -1,0 +1,25 @@
+I5 seed 2 ep    5 upd    285 dev margin    79.46 eps 0.980 q0     96.7 g0    421.3
+I5 seed 2 ep   10 upd    585 dev margin    79.46 eps 0.956 q0    180.3 g0    421.3
+I5 seed 2 ep   17 upd   1005 dev margin    79.46 eps 0.923 q0    258.7 g0    421.3
+I5 seed 2 ep   25 upd   1485 dev margin    57.16 eps 0.887 q0    334.2 g0    344.1
+I5 seed 2 ep   50 upd   2985 dev margin    79.46 eps 0.782 q0    501.2 g0    421.3
+I5 seed 2 ep  100 upd   5985 dev margin   103.95 eps 0.609 q0    448.3 g0    376.6
+I5 seed 2 ep  150 upd   8985 dev margin    79.46 eps 0.474 q0    334.0 g0    421.3
+I5 seed 2 ep  200 upd  11985 dev margin    80.69 eps 0.369 q0    269.8 g0    421.5
+I5 seed 2 ep  250 upd  14985 dev margin   104.06 eps 0.287 q0    163.3 g0    412.1
+I5 seed 2 ep  300 upd  17985 dev margin    95.65 eps 0.223 q0    123.8 g0    404.0
+I5 seed 2 ep  350 upd  20985 dev margin    80.04 eps 0.174 q0    145.5 g0    423.9
+I5 seed 2 ep  400 upd  23985 dev margin    95.38 eps 0.135 q0    162.5 g0    420.7
+I5 seed 2 ep  450 upd  26985 dev margin    85.65 eps 0.105 q0    172.8 g0    422.1
+I5 seed 2 ep  500 upd  29985 dev margin    93.25 eps 0.082 q0    189.0 g0    400.7
+I5 seed 2 ep  550 upd  32985 dev margin    88.22 eps 0.064 q0    209.0 g0    424.0
+I5 seed 2 ep  600 upd  35985 dev margin    99.30 eps 0.050 q0    214.5 g0    424.1
+I5 seed 2 ep  650 upd  38985 dev margin   107.30 eps 0.039 q0    221.9 g0    391.6
+I5 seed 2 ep  700 upd  41985 dev margin    90.47 eps 0.030 q0    228.3 g0    424.7
+I5 seed 2 ep  750 upd  44985 dev margin    81.74 eps 0.023 q0    239.2 g0    424.6
+I5 seed 2 ep  800 upd  47985 dev margin    86.80 eps 0.018 q0    246.6 g0    425.4
+I5 seed 2 ep  850 upd  50985 dev margin    99.56 eps 0.014 q0    254.9 g0    411.3
+I5 seed 2 ep  900 upd  53985 dev margin    95.95 eps 0.011 q0    256.4 g0    407.7
+I5 seed 2 ep  950 upd  56985 dev margin    91.41 eps 0.010 q0    245.8 g0    425.9
+I5 seed 2 ep 1000 upd  59985 dev margin    96.35 eps 0.010 q0    291.2 g0    382.7
+wrote experiments\v1\results\runs\confirmatory\I5_seed2.json: 1291.15 s training, 59985 updates
