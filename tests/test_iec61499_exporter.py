@@ -331,8 +331,13 @@ def test_runtime_gate_excuses_near_ties_only_when_asked(random_net, tmp_path):
     text = res.fbt_path.read_text(encoding="utf-8")
     last_max.write_text(text.replace(ARGMAX_LINE, ARGMAX_LINE.replace(">", ">="), 1), encoding="utf-8")
     states = np.random.default_rng(5).uniform(-2.0, 2.0, size=(3_000, 12))
-    net = ex.reference_network(policy)
-    tied = int(np.sum(torch_q(net, states).argmax(axis=1) == 0))
+    q = torch_q(ex.reference_network(policy), states)
+    q[:, 1] = q[:, 0]  # identical rows have equal exact Q-values; this keeps BLAS column rounding out of the reference
+
+    def net(_x):
+        return torch.from_numpy(q)
+
+    tied = int(np.sum(q.argmax(axis=1) == 0))
     assert tied > 0, "the test needs states where the tied pair is the best"
     assert ex.verify_fbt(res.fbt_path, policy, states, net=net)["ok"]
     strict = ex.verify_fbt(last_max, policy, states, net=net)
@@ -402,6 +407,7 @@ def test_strict_gate_rejects_near_tie_a_q_only_check_accepts(near_tie):
     assert diag["argmax_agreement"] == 0.0
 
 
+@pytest.mark.platform_reference
 def test_strict_gate_rejects_near_tie_checkpoint_on_measured_states(near_tie):
     """End to end, with the live PyTorch reference on the 20,000 states of the 2026-11-08 check.
     PyTorch's own values for these states move by up to 1.2e-4 with batch size, so another
@@ -413,8 +419,10 @@ def test_strict_gate_rejects_near_tie_checkpoint_on_measured_states(near_tie):
     x = np.concatenate([ex.rollout_states(st["n_rollout"], seed=st["seed"]), box]).astype(np.float32)
     assert hashlib.sha256(x.tobytes()).hexdigest() == st["float32_sha256"]
     idx = st["rejected_indices"]
-    if not np.array_equal(bits(torch_q(ex.reference_network(policy), x)[idx]), bits(q_ref)):
-        pytest.skip("PyTorch on this machine gives other float32 values for the two recorded states")
+    live = np.ascontiguousarray(torch_q(ex.reference_network(policy), x))
+    if hashlib.sha256(live.tobytes()).hexdigest() != st["reference_q_float32_sha256"]:
+        pytest.skip("PyTorch on this machine does not reproduce the recorded float32 reference on the 20,000 states")
+    assert np.array_equal(bits(live[idx]), bits(q_ref))
     rep = ex.verify_fbt(fbt, policy, x)
     assert not rep["ok"] and rep["checks"] == FAILED_CHECKS["argmax"], rep
     assert rep["argmax_disagreements"] == 2 and [e["state"] for e in rep["examples"]] == idx
@@ -493,6 +501,7 @@ def test_fbt_interface_ecc_and_algorithms(trained):
     sti.BasicFB(trained.fbt_path, n=1)  # also checks every WITH / ECAction / variable reference
 
 
+@pytest.mark.vendor
 def test_fbt_validates_against_eae_dtd(trained, eae_exe):
     etree = pytest.importorskip("lxml.etree")
     dtd_path = eae_exe.parents[2] / "data" / "Schemas" / "nxtLibraryElement.dtd"
@@ -579,6 +588,7 @@ def test_cli_exports_and_verifies(snapshot_state_dict, tmp_path, capsys):
 # ---------------------------------------------------------------------------
 # (b) EAE's own compiler (skipped when EAE Buildtime is not installed)
 # ---------------------------------------------------------------------------
+@pytest.mark.vendor
 @pytest.mark.parametrize("args", [(), ("/disable:AllowKeywords",), ("/enable:OPAFCompatible",)],
                          ids=["default", "keywords-reserved", "OPAF-profile"])
 def test_eae_compiler_accepts_fbt(trained, eae_exe, tmp_path, args):
@@ -592,6 +602,7 @@ def test_eae_compiler_accepts_fbt(trained, eae_exe, tmp_path, args):
     assert all(any(f"'{iv}' is not correct" in m for m in rep.context_messages) for iv in initial_values)
 
 
+@pytest.mark.vendor
 def test_eae_compiler_check_rejects_broken_fbt(trained, eae_exe, tmp_path):
     """Negative controls: the compile check above is not vacuous."""
     text = trained.fbt_path.read_text(encoding="utf-8")
@@ -851,6 +862,7 @@ def test_cors_and_websocket_accept_only_the_dashboard_origin(api_server):
     assert asgi_websocket_handshake(server.app) == "accepted"  # non-browser clients send no Origin
 
 
+@pytest.mark.service
 def test_server_starts_in_a_fresh_checkout_and_binds_loopback(tmp_path):
     """No data/ folder yet: main.py creates its log folder before logging to it."""
     for d in ("frontend/css", "frontend/js"):
@@ -865,6 +877,7 @@ def test_server_starts_in_a_fresh_checkout_and_binds_loopback(tmp_path):
     assert json.loads((REPO / "config" / "config.json").read_text(encoding="utf-8"))["server"]["host"] == "127.0.0.1"
 
 
+@pytest.mark.training
 def test_code_generation_during_training(api_server):
     """Generate while the training loop runs: the export works on a copy of the
     weights in a worker thread, so training keeps going and the FB still matches
