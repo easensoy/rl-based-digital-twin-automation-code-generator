@@ -1,0 +1,50 @@
+name: Portable verification
+
+# Interpreter, exporter and mutation checks that need neither EAE nor a controller.
+# No training and no server process. Vendor (EAE) checks are marked and may skip; with
+# STRICT_SKIPS=1 any other skip fails the job, so required coverage cannot disappear silently.
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    name: Python 3.11 on Ubuntu 22.04
+    runs-on: ubuntu-22.04
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      # requirements.txt pins torch==2.1.0. On Linux the PyPI wheel of that version pulls the CUDA
+      # libraries, so the CPU build of the same version is installed first; it satisfies the pin.
+      - name: Install the declared dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install torch==2.1.0 --index-url https://download.pytorch.org/whl/cpu
+          python -m pip install -r requirements.txt
+          python -m pip check
+
+      - name: Portable test suite (.fbt and standalone .st, gate, mutations, interpreter)
+        env:
+          STRICT_SKIPS: "1"
+        run: python -m pytest tests -m "not training and not service" -rs -p no:cacheprovider
+
+      - name: Export and verify the frozen snapshot from the command line
+        run: >-
+          python scripts/export_iec61499_fb.py
+          visual_outputs/run/policy_snapshot_20261106_190932.pt --out-dir out --verify 12000
+
+      - name: Regenerate figure data from stored evidence; it must not change
+        run: |
+          python docs/scripts/make_figures.py
+          git diff --exit-code -- docs/data/
