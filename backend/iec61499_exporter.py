@@ -792,7 +792,13 @@ def verify_fbt(fbt_path, policy: PolicyWeights, states, net=None, q_tolerance: f
     q_fb = fb.get(_Q).T.astype(np.float64)
     a_fb = np.asarray(st_interpreter.lanes(sample[action_output], n)).astype(np.int64)
     sp_fb = np.stack([st_interpreter.lanes(sample[nm], n) for nm in SETPOINT_OUTPUTS], axis=1).astype(np.float32)
+    return _gate_report(report, policy, q_ref, q_fb, a_fb, sp_fb, q_tolerance, tie_tolerance)
 
+
+def _gate_report(report, policy: PolicyWeights, q_ref, q_fb, a_fb, sp_fb, q_tolerance: float,
+                 tie_tolerance: float) -> Dict[str, object]:
+    """The acceptance predicate shared by verify_fbt and verify_st, applied to computed outputs."""
+    n = len(q_ref)
     a_ref = q_ref.argmax(axis=1)  # torch.argmax: the first maximum
     rows = np.arange(n)
     dq = np.abs(q_fb - q_ref)
@@ -824,6 +830,42 @@ def verify_fbt(fbt_path, policy: PolicyWeights, states, net=None, q_tolerance: f
                       "table_setpoints": [float(v) for v in table[a_ref[i]]]} for i in failing],
     })
     return report
+
+
+def verify_st(st_path, policy: PolicyWeights, states, net=None, q_tolerance: float = 1e-3,
+              tie_tolerance: float = 0.0, action_output: str = "ACTION") -> Dict[str, object]:
+    """verify_fbt for the IEC 61131-3 FUNCTION_BLOCK in the .st: st_interpreter calls the
+    block once per state (no IEC 61499 events), and the same predicate is applied against
+    ``net`` (default reference_network(policy); any callable mapping a float32 tensor of
+    states to Q-values)."""
+    import torch
+
+    st_interpreter = _sibling("st_interpreter")
+    net = net if net is not None else reference_network(policy)
+    x32 = np.asarray(states, dtype=np.float32)
+    n = len(x32)
+    with torch.no_grad():
+        q_ref = net(torch.from_numpy(x32)).numpy().astype(np.float64)
+    report: Dict[str, object] = {
+        "ok": False, "checks": {"q_values": False, "argmax": False, "setpoints": False},
+        "states": n, "q_tolerance": q_tolerance, "tie_tolerance": tie_tolerance,
+        "q_range": [float(q_ref.min()), float(q_ref.max())],
+    }
+    fb = st_interpreter.STFunctionBlock(Path(st_path), n=n)
+    decl_inputs = [nm for nm, d in fb.decls.items() if d.kind == "input"]
+    if decl_inputs == ["STATE"]:
+        inputs = {"STATE": x32.T}
+    else:
+        inputs = {nm: x32[:, j] for j, nm in enumerate(STATE_NAMES)}
+    out = fb(**inputs)
+    missing = [nm for nm in (action_output, *SETPOINT_OUTPUTS) if nm not in out]
+    if missing:
+        report["error"] = f"the FUNCTION_BLOCK has no output {', '.join(missing)}"
+        return report
+    q_fb = fb.get(_Q).T.astype(np.float64)
+    a_fb = np.asarray(st_interpreter.lanes(out[action_output], n)).astype(np.int64)
+    sp_fb = np.stack([st_interpreter.lanes(out[nm], n) for nm in SETPOINT_OUTPUTS], axis=1).astype(np.float32)
+    return _gate_report(report, policy, q_ref, q_fb, a_fb, sp_fb, q_tolerance, tie_tolerance)
 
 
 def verification_summary(report: Dict[str, object]) -> str:
