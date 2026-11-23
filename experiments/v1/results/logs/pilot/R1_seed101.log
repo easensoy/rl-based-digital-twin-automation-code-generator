@@ -1,0 +1,9 @@
+R1 seed 101 ep    5 upd    285 dev margin  -242.99 eps 0.980 q0     28.8 g0     29.3
+R1 seed 101 ep   10 upd    585 dev margin    18.85 eps 0.956 q0     55.6 g0     54.9
+R1 seed 101 ep   17 upd   1005 dev margin   -51.83 eps 0.923 q0     74.6 g0     48.9
+R1 seed 101 ep   25 upd   1485 dev margin   100.73 eps 0.887 q0    106.4 g0     64.9
+R1 seed 101 ep   50 upd   2985 dev margin  -244.33 eps 0.782 q0    109.2 g0     29.3
+R1 seed 101 ep  100 upd   5985 dev margin   100.73 eps 0.609 q0     85.2 g0     64.9
+R1 seed 101 ep  150 upd   8985 dev margin   111.96 eps 0.474 q0     73.6 g0     64.5
+R1 seed 101 ep  200 upd  11985 dev margin   119.34 eps 0.369 q0     77.0 g0     69.0
+wrote experiments\v1\results\runs\pilot\R1_seed101.json: 242.66 s training, 11985 updates
