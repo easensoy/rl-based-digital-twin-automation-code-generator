@@ -1,5 +1,10 @@
 # RL Digital Twin and PLC Code Generator: Technical Assessment
 
+> **Historical snapshot.** This assessment describes repository commit `898c112` as run on 6 November 2026,
+> before the IEC 61499 exporter, the verification gate and the dashboard changes that followed. Its findings
+> and measurements are kept as recorded; they do not evaluate those later changes. Current results and their
+> provenance: [README](../README.md) and [docs/EVIDENCE.md](../docs/EVIDENCE.md).
+
 **Author:** Emin Alper Sensoy · Automation Systems Group, WMG · 6 November 2026 · Repository commit `898c112`
 
 **Scope.**
