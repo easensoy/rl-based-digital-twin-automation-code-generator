@@ -1,0 +1,25 @@
+I1 seed 4 ep    5 upd      5 dev margin   100.73 eps 0.980 q0      0.1 g0     58.3
+I1 seed 4 ep   10 upd     10 dev margin   104.32 eps 0.956 q0      0.1 g0     57.6
+I1 seed 4 ep   17 upd     17 dev margin    57.16 eps 0.923 q0      0.2 g0     45.5
+I1 seed 4 ep   25 upd     25 dev margin    57.16 eps 0.887 q0      0.4 g0     45.6
+I1 seed 4 ep   50 upd     50 dev margin  -303.79 eps 0.782 q0      0.9 g0    -14.5
+I1 seed 4 ep  100 upd    100 dev margin   111.21 eps 0.609 q0      2.2 g0     59.0
+I1 seed 4 ep  150 upd    150 dev margin   109.63 eps 0.474 q0      8.9 g0     62.2
+I1 seed 4 ep  200 upd    200 dev margin    22.27 eps 0.369 q0     18.1 g0     49.7
+I1 seed 4 ep  250 upd    250 dev margin   115.13 eps 0.287 q0     24.9 g0     59.1
+I1 seed 4 ep  300 upd    300 dev margin   105.92 eps 0.223 q0     31.9 g0     54.6
+I1 seed 4 ep  350 upd    350 dev margin    26.06 eps 0.174 q0     36.9 g0     37.7
+I1 seed 4 ep  400 upd    400 dev margin  -130.67 eps 0.135 q0     43.1 g0     11.7
+I1 seed 4 ep  450 upd    450 dev margin    88.01 eps 0.105 q0     45.4 g0     56.5
+I1 seed 4 ep  500 upd    500 dev margin     6.78 eps 0.082 q0     45.0 g0     35.8
+I1 seed 4 ep  550 upd    550 dev margin   -33.08 eps 0.064 q0     48.1 g0     32.2
+I1 seed 4 ep  600 upd    600 dev margin    60.36 eps 0.050 q0     53.3 g0     45.8
+I1 seed 4 ep  650 upd    650 dev margin    98.84 eps 0.039 q0     56.6 g0     53.9
+I1 seed 4 ep  700 upd    700 dev margin   120.28 eps 0.030 q0     60.3 g0     63.8
+I1 seed 4 ep  750 upd    750 dev margin    90.94 eps 0.023 q0     65.9 g0     53.1
+I1 seed 4 ep  800 upd    800 dev margin   117.33 eps 0.018 q0     65.4 g0     63.6
+I1 seed 4 ep  850 upd    850 dev margin   120.57 eps 0.014 q0     62.4 g0     63.8
+I1 seed 4 ep  900 upd    900 dev margin   114.35 eps 0.011 q0     60.1 g0     62.8
+I1 seed 4 ep  950 upd    950 dev margin    35.96 eps 0.010 q0     60.5 g0     42.6
+I1 seed 4 ep 1000 upd   1000 dev margin    51.95 eps 0.010 q0     59.2 g0     44.1
+wrote experiments\v1\results\runs\confirmatory\I1_seed4.json: 159.77 s training, 1000 updates
