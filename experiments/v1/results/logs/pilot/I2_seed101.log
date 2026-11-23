@@ -1,0 +1,9 @@
+I2 seed 101 ep    5 upd    285 dev margin  -242.99 eps 0.980 q0     60.2 g0      2.0
+I2 seed 101 ep   10 upd    585 dev margin  -242.99 eps 0.956 q0    153.4 g0      2.0
+I2 seed 101 ep   17 upd   1005 dev margin    99.20 eps 0.923 q0    283.5 g0     53.1
+I2 seed 101 ep   25 upd   1485 dev margin    43.99 eps 0.887 q0    359.2 g0     44.2
+I2 seed 101 ep   50 upd   2985 dev margin    98.74 eps 0.782 q0    165.9 g0     52.8
+I2 seed 101 ep  100 upd   5985 dev margin    99.96 eps 0.609 q0     78.3 g0     53.0
+I2 seed 101 ep  150 upd   8985 dev margin  -164.39 eps 0.474 q0    133.1 g0      9.1
+I2 seed 101 ep  200 upd  11985 dev margin    -4.55 eps 0.369 q0     99.5 g0     35.4
+wrote experiments\v1\results\runs\pilot\I2_seed101.json: 244.65 s training, 11985 updates
