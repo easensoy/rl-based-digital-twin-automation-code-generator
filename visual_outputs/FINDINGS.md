@@ -1,5 +1,13 @@
 # Findings: `rl-based-digital-twin-automation-code-generator` @ `898c112`
 
+> **Historical snapshot.** These findings belong to the 6 November 2026 assessment of commit `898c112`, made
+> before the IEC 61499 exporter, the verification gate and the dashboard changes that followed. They are kept
+> as recorded and do not evaluate those later changes. Current results and their provenance:
+> [README](../README.md) and [docs/EVIDENCE.md](../docs/EVIDENCE.md). The current README does not use the
+> interpretation in section 4 that the greedy choice is set by noise because the action-value gap is below the
+> TD-loss RMSE: the two statistics come from different corpora (evaluation states and replay minibatches), and
+> a TD residual does not bound the action-value estimation error.
+
 Detailed companion to `REPORT.md` (the one-page summary). Repo location:
 `C:\rl-based-digital-twin-automation-code-generator`, branch `main`, HEAD `898c112` (2025-08-05).
 Remote: `https://github.com/easensoy/rl-based-digital-twin-automation-code-generator.git`.
