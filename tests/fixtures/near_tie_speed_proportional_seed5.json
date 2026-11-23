@@ -1,7 +1,7 @@
 {
  "what": "The two states on which the strict export gate rejected speed_proportional_seed5 on 2026-11-08. PyTorch's best two actions (Quality focus, Aggressive) differ by 1.22e-4, a few float32 ulps. The generated function block sums in another order, its two Q-values round to an exact tie, and its argmax keeps the first maximum: Aggressive, with Aggressive's setpoints. Every Q-value stays within the 1e-3 tolerance, so a Q-only check would accept this export; the strict gate rejects it.",
  "generated_by": "docs/scripts/extract_near_tie_fixture.py (deterministic: no timestamp, so the file hash is stable)",
- "measurement": "docs/data/export_verification.json, generated 2026-11-08T03:49:53",
+ "measurement": "docs/data/export_verification.json: the state-set, checkpoint and .fbt hashes below match it",
  "values": "float32 values written as exact decimals; *_bits are the IEEE 754 binary32 patterns",
  "checkpoint": {
   "path": "visual_outputs/run/eval_v2/policies/speed_proportional_seed5.pt",
@@ -24,7 +24,8 @@
   "rejected_indices": [
    13327,
    14848
-  ]
+  ],
+  "reference_q_float32_sha256": "0d6200a61dbe4b2b5efe967c7a5a6f1b6f8371563dcb0c86966590a04d92a580"
  },
  "state_names": [
   "POS_X",
