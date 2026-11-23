@@ -72,7 +72,8 @@ def sha256(path: Path) -> str:
 
 
 def git(*args) -> str:
-    return subprocess.run(["git", *args], cwd=REPO, capture_output=True, text=True).stdout.strip()
+    # rstrip only: the leading space of a `git status --porcelain` line is part of its status code
+    return subprocess.run(["git", *args], cwd=REPO, capture_output=True, text=True).stdout.rstrip()
 
 
 def states() -> np.ndarray:
