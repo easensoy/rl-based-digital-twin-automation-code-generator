@@ -1,0 +1,610 @@
+{
+ "seeds": [
+  10000,
+  10099
+ ],
+ "models": {
+  "legacy": {
+   "policies": {
+    "Always 0: Conservative": {
+     "reward_mean": 1772.3726651633378,
+     "per_step_components": {
+      "production": 0.2681,
+      "quality": 4.7327,
+      "energy_efficiency": 1.861,
+      "safety": 0.0,
+      "vibration": 0.0,
+      "cycle_bonus": 2.0
+     },
+     "counted_parts": 8.0,
+     "physical_parts": 5.33333333333333,
+     "energy": 122.39999999999965,
+     "quality": 0.8930895952427237,
+     "constraint_events_total": 0,
+     "max_abs_temp_pressure_vib": [
+      0.935,
+      1.012,
+      0.34
+     ]
+    },
+    "Always 1: Normal": {
+     "reward_mean": 1715.5400277139986,
+     "per_step_components": {
+      "production": 0.2025,
+      "quality": 4.8752,
+      "energy_efficiency": 1.5,
+      "safety": 0.0,
+      "vibration": 0.0,
+      "cycle_bonus": 2.0
+     },
+     "counted_parts": 6.0,
+     "physical_parts": 6.666666666666652,
+     "energy": 200.0,
+     "quality": 0.9500895952427234,
+     "constraint_events_total": 0,
+     "max_abs_temp_pressure_vib": [
+      1.085,
+      1.112,
+      0.425
+     ]
+    },
+    "Always 2: Aggressive": {
+     "reward_mean": 1622.0175036146957,
+     "per_step_components": {
+      "production": 0.1539,
+      "quality": 4.7327,
+      "energy_efficiency": 1.2235,
+      "safety": 0.0,
+      "vibration": 0.0,
+      "cycle_bonus": 2.0
+     },
+     "counted_parts": 5.0,
+     "physical_parts": 8.000000000000004,
+     "energy": 290.39999999999975,
+     "quality": 0.8930895952427237,
+     "constraint_events_total": 0,
+     "max_abs_temp_pressure_vib": [
+      1.185,
+      1.212,
+      0.51
+     ]
+    },
+    "Always 3: Energy saving": {
+     "reward_mean": 1827.377951324987,
+     "per_step_components": {
+      "production": 0.379,
+      "quality": 4.5902,
+      "energy_efficiency": 2.1676,
+      "safety": 0.0,
+      "vibration": 0.0,
+      "cycle_bonus": 2.0
+     },
+     "counted_parts": 11.0,
+     "physical_parts": 4.000000000000002,
+     "energy": 76.80000000000007,
+     "quality": 0.8360895952427236,
+     "constraint_events_total": 0,
+     "max_abs_temp_pressure_vib": [
+      0.885,
+      0.913,
+      0.255
+     ]
+    },
+    "Always 4: Quality focus": {
+     "reward_mean": 1682.5823106649957,
+     "per_step_components": {
+      "production": 0.1785,
+      "quality": 4.804,
+      "energy_efficiency": 1.4304,
+      "safety": 0.0,
+      "vibration": 0.0,
+      "cycle_bonus": 2.0
+     },
+     "counted_parts": 6.0,
+     "physical_parts": 7.333333333333367,
+     "energy": 219.45000000000044,
+     "quality": 0.9215895952427237,
+     "constraint_events_total": 0,
+     "max_abs_temp_pressure_vib": [
+      1.035,
+      1.162,
+      0.468
+     ]
+    },
+    "Always 5: Balanced": {
+     "reward_mean": 1744.0534313566488,
+     "per_step_components": {
+      "production": 0.2209,
+      "quality": 4.804,
+      "energy_efficiency": 1.6954,
+      "safety": 0.0,
+      "vibration": 0.0,
+      "cycle_bonus": 2.0
+     },
+     "counted_parts": 7.0,
+     "physical_parts": 6.000000000000005,
+     "energy": 153.89999999999935,
+     "quality": 0.9215895952427237,
+     "constraint_events_total": 0,
+     "max_abs_temp_pressure_vib": [
+      0.985,
+      1.062,
+      0.383
+     ]
+    },
+    "Uniform random": {
+     "reward_mean": 1715.6904216763471,
+     "per_step_components": {
+      "production": 0.2304,
+      "quality": 4.7558,
+      "energy_efficiency": 1.5923,
+      "safety": 0.0,
+      "vibration": 0.0,
+      "cycle_bonus": 2.0
+     },
+     "counted_parts": 7.0,
+     "physical_parts": 6.221266666666663,
+     "energy": 177.2170274999997,
+     "quality": 0.9023064952427237,
+     "constraint_events_total": 0,
+     "max_abs_temp_pressure_vib": [
+      1.08,
+      1.085,
+      0.431
+     ]
+    },
+    "DQN legacy_seed1": {
+     "reward_mean": 1682.5823106649957,
+     "per_step_components": {
+      "production": 0.1785,
+      "quality": 4.804,
+      "energy_efficiency": 1.4304,
+      "safety": 0.0,
+      "vibration": 0.0,
+      "cycle_bonus": 2.0
+     },
+     "counted_parts": 6.0,
+     "physical_parts": 7.333333333333367,
+     "energy": 219.45000000000044,
+     "quality": 0.9215895952427237,
+     "constraint_events_total": 0,
+     "max_abs_temp_pressure_vib": [
+      1.035,
+      1.162,
+      0.468
+     ]
+    },
+    "DQN legacy_seed2": {
+     "reward_mean": 1622.0175036146957,
+     "per_step_components": {
+      "production": 0.1539,
+      "quality": 4.7327,
+      "energy_efficiency": 1.2235,
+      "safety": 0.0,
+      "vibration": 0.0,
+      "cycle_bonus": 2.0
+     },
+     "counted_parts": 5.0,
+     "physical_parts": 8.000000000000004,
+     "energy": 290.39999999999975,
+     "quality": 0.8930895952427237,
+     "constraint_events_total": 0,
+     "max_abs_temp_pressure_vib": [
+      1.185,
+      1.212,
+      0.51
+     ]
+    },
+    "DQN legacy_seed3": {
+     "reward_mean": 1744.0534313566488,
+     "per_step_components": {
+      "production": 0.2209,
+      "quality": 4.804,
+      "energy_efficiency": 1.6954,
+      "safety": 0.0,
+      "vibration": 0.0,
+      "cycle_bonus": 2.0
+     },
+     "counted_parts": 7.0,
+     "physical_parts": 6.000000000000005,
+     "energy": 153.89999999999935,
+     "quality": 0.9215895952427237,
+     "constraint_events_total": 0,
+     "max_abs_temp_pressure_vib": [
+      0.985,
+      1.062,
+      0.383
+     ]
+    },
+    "DQN legacy_seed4": {
+     "reward_mean": 1744.0534313566488,
+     "per_step_components": {
+      "production": 0.2209,
+      "quality": 4.804,
+      "energy_efficiency": 1.6954,
+      "safety": 0.0,
+      "vibration": 0.0,
+      "cycle_bonus": 2.0
+     },
+     "counted_parts": 7.0,
+     "physical_parts": 6.000000000000005,
+     "energy": 153.89999999999935,
+     "quality": 0.9215895952427237,
+     "constraint_events_total": 0,
+     "max_abs_temp_pressure_vib": [
+      0.985,
+      1.062,
+      0.383
+     ]
+    },
+    "DQN legacy_seed42": {
+     "reward_mean": 1622.0175036146957,
+     "per_step_components": {
+      "production": 0.1539,
+      "quality": 4.7327,
+      "energy_efficiency": 1.2235,
+      "safety": 0.0,
+      "vibration": 0.0,
+      "cycle_bonus": 2.0
+     },
+     "counted_parts": 5.0,
+     "physical_parts": 8.000000000000004,
+     "energy": 290.39999999999975,
+     "quality": 0.8930895952427237,
+     "constraint_events_total": 0,
+     "max_abs_temp_pressure_vib": [
+      1.185,
+      1.212,
+      0.51
+     ]
+    },
+    "DQN legacy_seed5": {
+     "reward_mean": 1622.0175036146957,
+     "per_step_components": {
+      "production": 0.1539,
+      "quality": 4.7327,
+      "energy_efficiency": 1.2235,
+      "safety": 0.0,
+      "vibration": 0.0,
+      "cycle_bonus": 2.0
+     },
+     "counted_parts": 5.0,
+     "physical_parts": 8.000000000000004,
+     "energy": 290.39999999999975,
+     "quality": 0.8930895952427237,
+     "constraint_events_total": 0,
+     "max_abs_temp_pressure_vib": [
+      1.185,
+      1.212,
+      0.51
+     ]
+    },
+    "DQN server snapshot": {
+     "reward_mean": 1682.5823106649957,
+     "per_step_components": {
+      "production": 0.1785,
+      "quality": 4.804,
+      "energy_efficiency": 1.4304,
+      "safety": 0.0,
+      "vibration": 0.0,
+      "cycle_bonus": 2.0
+     },
+     "counted_parts": 6.0,
+     "physical_parts": 7.333333333333367,
+     "energy": 219.45000000000044,
+     "quality": 0.9215895952427237,
+     "constraint_events_total": 0,
+     "max_abs_temp_pressure_vib": [
+      1.035,
+      1.162,
+      0.468
+     ]
+    }
+   },
+   "schedule_search": {
+    "schedules": 210,
+    "search_seeds": 20,
+    "best": {
+     "a": "Energy saving",
+     "b": "Normal",
+     "k": 150
+    },
+    "best_fixed": "Energy saving",
+    "paired_diff_mean": 6.59928118432924,
+    "paired_diff_ci95": 1.5727456235584954e-13,
+    "relative_gain": 0.003611338956751811
+   }
+  },
+  "speed_proportional": {
+   "policies": {
+    "Always 0: Conservative": {
+     "reward_mean": 1748.409752638512,
+     "per_step_components": {
+      "production": 0.1483,
+      "quality": 4.7327,
+      "energy_efficiency": 1.861,
+      "safety": 0.0,
+      "vibration": 0.0,
+      "cycle_bonus": 2.0
+     },
+     "counted_parts": 5.0,
+     "physical_parts": 5.33333333333333,
+     "energy": 122.39999999999965,
+     "quality": 0.8930895952427237,
+     "constraint_events_total": 0,
+     "max_abs_temp_pressure_vib": [
+      0.935,
+      1.012,
+      0.34
+     ]
+    },
+    "Always 1: Normal": {
+     "reward_mean": 1715.5400277139986,
+     "per_step_components": {
+      "production": 0.2025,
+      "quality": 4.8752,
+      "energy_efficiency": 1.5,
+      "safety": 0.0,
+      "vibration": 0.0,
+      "cycle_bonus": 2.0
+     },
+     "counted_parts": 6.0,
+     "physical_parts": 6.666666666666652,
+     "energy": 200.0,
+     "quality": 0.9500895952427234,
+     "constraint_events_total": 0,
+     "max_abs_temp_pressure_vib": [
+      1.085,
+      1.112,
+      0.425
+     ]
+    },
+    "Always 2: Aggressive": {
+     "reward_mean": 1639.7756601552778,
+     "per_step_components": {
+      "production": 0.2427,
+      "quality": 4.7327,
+      "energy_efficiency": 1.2235,
+      "safety": 0.0,
+      "vibration": 0.0,
+      "cycle_bonus": 2.0
+     },
+     "counted_parts": 7.0,
+     "physical_parts": 8.000000000000004,
+     "energy": 290.39999999999975,
+     "quality": 0.8930895952427237,
+     "constraint_events_total": 0,
+     "max_abs_temp_pressure_vib": [
+      1.185,
+      1.212,
+      0.51
+     ]
+    },
+    "Always 3: Energy saving": {
+     "reward_mean": 1771.5541097355394,
+     "per_step_components": {
+      "production": 0.0999,
+      "quality": 4.5902,
+      "energy_efficiency": 2.1676,
+      "safety": 0.0,
+      "vibration": 0.0,
+      "cycle_bonus": 2.0
+     },
+     "counted_parts": 4.0,
+     "physical_parts": 4.000000000000002,
+     "energy": 76.80000000000007,
+     "quality": 0.8360895952427236,
+     "constraint_events_total": 0,
+     "max_abs_temp_pressure_vib": [
+      0.885,
+      0.913,
+      0.255
+     ]
+    },
+    "Always 4: Quality focus": {
+     "reward_mean": 1691.0635215018076,
+     "per_step_components": {
+      "production": 0.2209,
+      "quality": 4.804,
+      "energy_efficiency": 1.4304,
+      "safety": 0.0,
+      "vibration": 0.0,
+      "cycle_bonus": 2.0
+     },
+     "counted_parts": 7.0,
+     "physical_parts": 7.333333333333367,
+     "energy": 219.45000000000044,
+     "quality": 0.9215895952427237,
+     "constraint_events_total": 0,
+     "max_abs_temp_pressure_vib": [
+      1.035,
+      1.162,
+      0.468
+     ]
+    },
+    "Always 5: Balanced": {
+     "reward_mean": 1734.194183310467,
+     "per_step_components": {
+      "production": 0.1716,
+      "quality": 4.804,
+      "energy_efficiency": 1.6954,
+      "safety": 0.0,
+      "vibration": 0.0,
+      "cycle_bonus": 2.0
+     },
+     "counted_parts": 5.0,
+     "physical_parts": 6.000000000000005,
+     "energy": 153.89999999999935,
+     "quality": 0.9215895952427237,
+     "constraint_events_total": 0,
+     "max_abs_temp_pressure_vib": [
+      0.985,
+      1.062,
+      0.383
+     ]
+    },
+    "Uniform random": {
+     "reward_mean": 1705.9088571263649,
+     "per_step_components": {
+      "production": 0.1815,
+      "quality": 4.7558,
+      "energy_efficiency": 1.5923,
+      "safety": 0.0,
+      "vibration": 0.0,
+      "cycle_bonus": 2.0
+     },
+     "counted_parts": 5.94,
+     "physical_parts": 6.221266666666663,
+     "energy": 177.2170274999997,
+     "quality": 0.9023064952427237,
+     "constraint_events_total": 0,
+     "max_abs_temp_pressure_vib": [
+      1.08,
+      1.085,
+      0.431
+     ]
+    },
+    "DQN speed_proportional_seed1": {
+     "reward_mean": 1715.5400277139986,
+     "per_step_components": {
+      "production": 0.2025,
+      "quality": 4.8752,
+      "energy_efficiency": 1.5,
+      "safety": 0.0,
+      "vibration": 0.0,
+      "cycle_bonus": 2.0
+     },
+     "counted_parts": 6.0,
+     "physical_parts": 6.666666666666652,
+     "energy": 200.0,
+     "quality": 0.9500895952427234,
+     "constraint_events_total": 0,
+     "max_abs_temp_pressure_vib": [
+      1.085,
+      1.112,
+      0.425
+     ]
+    },
+    "DQN speed_proportional_seed2": {
+     "reward_mean": 1691.0635215018076,
+     "per_step_components": {
+      "production": 0.2209,
+      "quality": 4.804,
+      "energy_efficiency": 1.4304,
+      "safety": 0.0,
+      "vibration": 0.0,
+      "cycle_bonus": 2.0
+     },
+     "counted_parts": 7.0,
+     "physical_parts": 7.333333333333367,
+     "energy": 219.45000000000044,
+     "quality": 0.9215895952427237,
+     "constraint_events_total": 0,
+     "max_abs_temp_pressure_vib": [
+      1.035,
+      1.162,
+      0.468
+     ]
+    },
+    "DQN speed_proportional_seed3": {
+     "reward_mean": 1639.7756601552778,
+     "per_step_components": {
+      "production": 0.2427,
+      "quality": 4.7327,
+      "energy_efficiency": 1.2235,
+      "safety": 0.0,
+      "vibration": 0.0,
+      "cycle_bonus": 2.0
+     },
+     "counted_parts": 7.0,
+     "physical_parts": 8.000000000000004,
+     "energy": 290.39999999999975,
+     "quality": 0.8930895952427237,
+     "constraint_events_total": 0,
+     "max_abs_temp_pressure_vib": [
+      1.185,
+      1.212,
+      0.51
+     ]
+    },
+    "DQN speed_proportional_seed4": {
+     "reward_mean": 1691.0635215018076,
+     "per_step_components": {
+      "production": 0.2209,
+      "quality": 4.804,
+      "energy_efficiency": 1.4304,
+      "safety": 0.0,
+      "vibration": 0.0,
+      "cycle_bonus": 2.0
+     },
+     "counted_parts": 7.0,
+     "physical_parts": 7.333333333333367,
+     "energy": 219.45000000000044,
+     "quality": 0.9215895952427237,
+     "constraint_events_total": 0,
+     "max_abs_temp_pressure_vib": [
+      1.035,
+      1.162,
+      0.468
+     ]
+    },
+    "DQN speed_proportional_seed42": {
+     "reward_mean": 1639.7756601552778,
+     "per_step_components": {
+      "production": 0.2427,
+      "quality": 4.7327,
+      "energy_efficiency": 1.2235,
+      "safety": 0.0,
+      "vibration": 0.0,
+      "cycle_bonus": 2.0
+     },
+     "counted_parts": 7.0,
+     "physical_parts": 8.000000000000004,
+     "energy": 290.39999999999975,
+     "quality": 0.8930895952427237,
+     "constraint_events_total": 0,
+     "max_abs_temp_pressure_vib": [
+      1.185,
+      1.212,
+      0.51
+     ]
+    },
+    "DQN speed_proportional_seed5": {
+     "reward_mean": 1639.7756601552778,
+     "per_step_components": {
+      "production": 0.2427,
+      "quality": 4.7327,
+      "energy_efficiency": 1.2235,
+      "safety": 0.0,
+      "vibration": 0.0,
+      "cycle_bonus": 2.0
+     },
+     "counted_parts": 7.0,
+     "physical_parts": 8.000000000000004,
+     "energy": 290.39999999999975,
+     "quality": 0.8930895952427237,
+     "constraint_events_total": 0,
+     "max_abs_temp_pressure_vib": [
+      1.185,
+      1.212,
+      0.51
+     ]
+    }
+   },
+   "schedule_search": {
+    "schedules": 210,
+    "search_seeds": 20,
+    "best": {
+     "a": "Energy saving",
+     "b": "Normal",
+     "k": 125
+    },
+    "best_fixed": "Energy saving",
+    "paired_diff_mean": 9.031407380973716,
+    "paired_diff_ci95": 1.4016478854652877e-13,
+    "relative_gain": 0.005098013846340793
+   }
+  }
+ },
+ "wall_seconds": 366.4
+}
